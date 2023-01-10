@@ -7,6 +7,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",

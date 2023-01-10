@@ -14,3 +14,7 @@
 * {
     font-family: 'Varela Round', sans-serif;
 }
+
+.navLink {
+    @apply flex gap-4 w-full justify-center md:justify-start md:pl-8 py-2 items-center hover:bg-primary-400/20 cursor-pointer;
+}
