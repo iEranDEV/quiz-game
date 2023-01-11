@@ -2,13 +2,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { HiXMark } from "react-icons/hi2";
-import { TbUser, TbLockSquare, TbQuestionMark, TbShieldCheck, TbDiamond } from "react-icons/tb";
+import { TbUser, TbLockSquare, TbQuestionMark, TbShieldCheck, TbDiamond, TbLogout } from "react-icons/tb";
+import { useDispatch } from "react-redux";
+import { auth } from "../firebase";
+import { setUser } from "../store/userSlice";
 
 
 function SettingsLayout({ children }: {children: JSX.Element}) {
     const [menu, setMenu] = useState(false);
 
     const router = useRouter();
+    const dispatch = useDispatch();
+
+    const handleLogOut = () => {
+        auth.signOut().then(() => {
+            dispatch(setUser(null));
+            router.push('/accounts/login');
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
 
     return (
         <div className="w-full h-full flex lg:border-l border-primary-200">
@@ -43,13 +56,17 @@ function SettingsLayout({ children }: {children: JSX.Element}) {
                     <TbShieldCheck className='w-5 h-5 text-orange-300'></TbShieldCheck>
                     <p>Privacy policy</p>
                 </Link>
+                <div className="settingsLink text-red-300" onClick={() => handleLogOut()}>
+                    <TbLogout className="w-5 h-5 text-red-400"></TbLogout>
+                    <p>Log out</p>
+                </div>
             </nav>
             <div className="w-full h-full flex flex-col">
                 <div className="w-full p-4 cursor-pointer lg:cursor-auto" onClick={() => setMenu(true)}>
                     <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Settings</p>
                     <span className="text-primary-300 font-semibold lg:hidden">Click to open settings menu</span>
                 </div>
-                <div className="w-full h-full">
+                <div className="w-full h-full px-4">
                     {children}
                 </div>
             </div>

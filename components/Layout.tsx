@@ -20,8 +20,9 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const user = useSelector((state: RootState) => state.user.user);
     const loading = useSelector((state: RootState) => state.user.loading);
 
-    /*useEffect(() => {
+    useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (data) => {
+            console.log(data)
             if(data) {
                 dispatch(setLoading(true));
                 const userSnap = await getDoc(doc(db, "users", data.uid));
@@ -38,7 +39,7 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
             }
         })
         return unsubscribe;
-    }, [])*/
+    }, [])
 
     return (
         <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">

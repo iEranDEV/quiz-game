@@ -9,10 +9,10 @@ function UserSettings() {
     return (
         <Layout>
             <SettingsLayout>
-                <div className="w-full h-full bg-red-500">
-                    s
+                <div className="w-full h-full">
+                    user
                 </div>
-                </SettingsLayout>
+            </SettingsLayout>
         </Layout>
     )
 }

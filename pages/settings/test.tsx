@@ -9,7 +9,7 @@ function TestSettings() {
     return (
         <Layout>
             <SettingsLayout>
-                <div className="w-full h-full px-4">
+                <div className="w-full h-full">
                     <p>{'tu cos zrobie dzisiaj :* <3'}</p>
                 </div>
             </SettingsLayout>
