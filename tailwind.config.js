@@ -16,6 +16,15 @@ module.exports = {
 			},
 			boxShadow: {
 				'DEFAULT': '0 5px 0 0',
+			},
+			keyframes: {
+				slideIn: {
+					'0%': { transform: 'translateX(-2.5rem)' },
+					'100%': { transform: 'translateX(0px)' }
+				}
+			},
+			animation: {
+				'slideIn': 'slideIn 0.3s forwards ease-in-out'
 			}
 		},
 	},

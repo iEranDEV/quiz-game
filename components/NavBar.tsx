@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { HiBars3, HiXMark } from "react-icons/hi2";
-import { TbBell, TbHome, TbSettings, TbUser, TbUsers } from "react-icons/tb";
+import { TbBell, TbHome, TbSettings, TbUser, TbUsers, TbBulb } from "react-icons/tb";
 
 function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user: User | null}) {
 
@@ -12,7 +12,7 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
             <HiBars3 onClick={() => setMenu(!menu)} className='w-8 h-8 md:hidden'></HiBars3>
 
             <div className={`fixed w-screen md:w-20 lg:w-60 h-screen top-0 left-0 flex flex-col bg-primary-300 gap-16 md:gap-0 justify-center md:justify-around items-center transition-all md:static ${menu ? 'left-0' : '-left-full'}`}>
-                <div className='flex w-full items-center p-4 absolute top-0 left-0'>
+                <div className='flex md:hidden w-full items-center p-4 absolute top-0 left-0'>
                     <HiXMark onClick={() => setMenu(!menu)} className='w-8 h-8 md:hidden'></HiXMark>
                 </div>
 
@@ -43,6 +43,10 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                     <div className='navLink'>
                         <TbBell className='w-5 h-5 text-orange-300'></TbBell>
                         <p>Notifications</p>
+                    </div>
+                    <div className='navLink'>
+                        <TbBulb className='w-5 h-5 text-orange-300'></TbBulb>
+                        <p>Send an idea</p>
                     </div>
                 </div>
                 {user && 

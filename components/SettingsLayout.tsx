@@ -24,7 +24,7 @@ function SettingsLayout({ children }: {children: JSX.Element}) {
     }
 
     return (
-        <div className="w-full h-full flex lg:border-l border-primary-200">
+        <div className="w-full h-full flex lg:border-l border-primary-200 -mx-4">
             <nav className={`z-10 fixed lg:static bg-primary-300 md:pl-20 lg:pl-0 w-full lg:w-80 justify-start gap-2 items-center h-full text-primary-100 transition-all flex flex-col ${menu ? 'right-0' : '-right-full'}`}>
                 <div className='flex w-full items-center p-4'>
                     <HiXMark onClick={() => setMenu(!menu)} className='w-8 h-8 lg:hidden cursor-pointer'></HiXMark>

@@ -1,5 +1,6 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useRouter } from "next/router";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { BiUser, BiImage, BiTrash } from "react-icons/bi";
 import { MdLibraryAddCheck } from "react-icons/md";
@@ -8,6 +9,7 @@ import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import SettingsLayout from "../../components/SettingsLayout";
 import { db, storage } from "../../firebase";
+import { addNotification } from "../../store/notificationsSlice";
 import { RootState } from "../../store/store";
 import { setUser } from "../../store/userSlice";
 
@@ -19,7 +21,7 @@ function UserSettings() {
 
     const user = useSelector((state: RootState) => state.user.user);
     const dispatch = useDispatch();
-
+    const router = useRouter();
     const fileRef = useRef(null);
 
     useEffect(() => {
@@ -61,6 +63,12 @@ function UserSettings() {
             newUser.username = username as string;
             newUser.photoURL = (url != null ? url : photo);
             dispatch(setUser(newUser));
+            router.push('/')
+            dispatch(addNotification({
+                id: crypto.randomUUID(),
+                type: 'success',
+                message: 'User profile updated successfully!'
+            }))
         }).catch((error) => {
             console.log('error');
         })

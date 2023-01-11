@@ -8,4 +8,10 @@ declare global {
         photoURL: string | null,
     }
 
+    type INotification = {
+        id: string,
+        type: 'success' | 'info' | 'error',
+        message: string
+    }
+
 }

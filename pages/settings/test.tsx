@@ -10,7 +10,6 @@ function TestSettings() {
         <Layout>
             <SettingsLayout>
                 <div className="w-full h-full">
-                    <p>{'tu cos zrobie dzisiaj :* <3'}</p>
                 </div>
             </SettingsLayout>
         </Layout>
