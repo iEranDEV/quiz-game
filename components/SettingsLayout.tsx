@@ -52,10 +52,6 @@ function SettingsLayout({ children }: {children: JSX.Element}) {
                     <TbQuestionMark className='w-5 h-5 text-orange-300'></TbQuestionMark>
                     <p>Ask question</p>
                 </Link>
-                <Link href="/" className={`settingsLink`} onClick={() => setMenu(false)}>
-                    <TbShieldCheck className='w-5 h-5 text-orange-300'></TbShieldCheck>
-                    <p>Privacy policy</p>
-                </Link>
                 <div className="settingsLink text-red-300" onClick={() => handleLogOut()}>
                     <TbLogout className="w-5 h-5 text-red-400"></TbLogout>
                     <p>Log out</p>
@@ -63,10 +59,10 @@ function SettingsLayout({ children }: {children: JSX.Element}) {
             </nav>
             <div className="w-full h-full flex flex-col">
                 <div className="w-full p-4 cursor-pointer lg:cursor-auto" onClick={() => setMenu(true)}>
-                    <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Settings</p>
-                    <span className="text-primary-300 font-semibold lg:hidden">Click to open settings menu</span>
+                    <p className="text-primary-300 tracking-widest uppercase font-bold text-xl">Settings</p>
+                    <span className="text-primary-100 font-semibold lg:hidden">Click to open settings menu</span>
                 </div>
-                <div className="w-full h-full px-4">
+                <div className="w-full h-full px-4 py-8">
                     {children}
                 </div>
             </div>

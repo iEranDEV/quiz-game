@@ -26,3 +26,11 @@
 .settingsLink {
     @apply flex gap-4 w-full justify-start py-2 items-center hover:bg-primary-400/20 cursor-pointer px-6;
 }
+
+.login-form {
+    @apply w-full bg-primary-300 border-b-2 border-primary-200 placeholder-primary-100;
+}
+
+.form-control {
+    @apply w-full bg-primary-200 border-b-2 border-primary-300 placeholder-primary-100 text-stone-50;
+}

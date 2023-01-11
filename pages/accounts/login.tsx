@@ -50,12 +50,12 @@ function Login() {
 
                 <div className="flex justify-center gap-4 w-full">
                     <MdAlternateEmail className="h-5 w-5 text-orange-300"></MdAlternateEmail>
-                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" className="w-full bg-primary-300 border-b-2 border-primary-200 placeholder-primary-100" placeholder="E-mail address" />
+                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" className="login-form" placeholder="E-mail address" />
                 </div>
 
                 <div className="flex justify-center gap-4 w-full">
                     <BiLockAlt className="h-5 w-5 text-orange-300"></BiLockAlt>
-                    <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="w-full bg-primary-300 border-b-2 border-primary-200 placeholder-primary-100" placeholder="Password" />
+                    <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="login-form" placeholder="Password" />
                 </div>
 
                 <Button bgColor="bg-primary-200" shadowColor="shadow-primary-400" width={'w-60'}>
