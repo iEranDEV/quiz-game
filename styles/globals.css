@@ -16,5 +16,9 @@
 }
 
 .navLink {
-    @apply flex gap-4 w-full justify-center md:justify-start md:pl-8 py-2 items-center hover:bg-primary-400/20 cursor-pointer;
+    @apply flex gap-4 w-full justify-center md:justify-start lg:pl-8 md:px-6 lg:px-0 py-2 items-center hover:bg-primary-400/20 cursor-pointer;
+}
+
+.navLink p {
+    @apply block md:hidden lg:block;
 }

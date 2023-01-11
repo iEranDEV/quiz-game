@@ -8,6 +8,7 @@ import { auth, db } from '../firebase';
 import { RootState } from '../store/store';
 import { setLoading, setUser } from '../store/userSlice';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import Link from 'next/link';
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
@@ -20,7 +21,6 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (data) => {
-            console.log(data);
             if(data) {
                 dispatch(setLoading(true));
                 const userSnap = await getDoc(doc(db, "users", data.uid));
@@ -41,46 +41,50 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
 
     return (
         <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">
-            <div className="flex w-full md:w-auto items-center p-4 md:p-0">
+            <nav className="flex w-full md:w-auto items-center p-4 md:p-0">
                 <HiBars3 onClick={() => setMenu(!menu)} className='w-8 h-8 md:hidden'></HiBars3>
 
-                <div className={`fixed w-screen md:w-60 h-screen top-0 left-0 flex flex-col bg-primary-300 gap-16 md:gap-0 justify-center md:justify-around items-center transition-all md:static ${menu ? 'left-0' : '-left-full'}`}>
+                <div className={`fixed w-screen md:w-auto lg:w-60 h-screen top-0 left-0 flex flex-col bg-primary-300 gap-16 md:gap-0 justify-center md:justify-around items-center transition-all md:static ${menu ? 'left-0' : '-left-full'}`}>
                     <div className='flex w-full items-center p-4 absolute top-0 left-0'>
                         <HiXMark onClick={() => setMenu(!menu)} className='w-8 h-8 md:hidden'></HiXMark>
                     </div>
 
-                    <p style={{fontFamily: 'Bouncy'}} className='text-3xl text-orange-300'>quizly</p>
+                    <p style={{fontFamily: 'Bouncy'}} className='text-3xl text-orange-300 block md:hidden lg:block'>quizly</p>
 
                     <div className='flex flex-col w-full justify-center items-center'>
-                        <div className={`navLink ${router.pathname === '/' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
-                            <TbHome className='w-5 h-5 text-orange-300'></TbHome>
-                            Home
-                        </div>
+                        <Link href="/" className='w-full'>
+                            <div className={`navLink ${router.pathname === '/' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                                <TbHome className='w-5 h-5 text-orange-300'></TbHome>
+                                <p>Home</p>
+                            </div>
+                        </Link>
                         <div className='navLink'>
                             <TbUsers className='w-5 h-5 text-orange-300'></TbUsers>
-                            Friends
+                            <p>Friends</p>
                             {/*<div className='h-4 p-1 bg-orange-300 rounded-full text-xs flex justify-center items-center text-primary-400'>100</div>*/}
                         </div>
                         <div className='navLink'>
                             <TbUser className='w-5 h-5 text-orange-300'></TbUser>
-                            Profile
+                            <p>Profile</p>
                         </div>
-                        <div className='navLink'>
-                            <TbSettings className='w-5 h-5 text-orange-300'></TbSettings>
-                            Settings
-                        </div>
+                        <Link href="/settings" className='w-full'>
+                            <div className={`navLink ${router.pathname === '/settings' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                                <TbSettings className='w-5 h-5 text-orange-300'></TbSettings>
+                                <p>Settings</p>
+                            </div>
+                        </Link>
                         <div className='navLink'>
                             <TbBell className='w-5 h-5 text-orange-300'></TbBell>
-                            Notifications
+                            <p>Notifications</p>
                         </div>
                     </div>
                     {user && 
-                        <div className='w-full flex items-center gap-2 justify-center'>
+                        <div className='w-full flex items-center gap-2 justify-center text-sm md:hidden lg:flex'>
                             <p>Logged as <span className='text-orange-300'>{user.username}</span></p>
                         </div>    
                     }
                 </div>
-            </div>
+            </nav>
             <div className="w-full text-stone-50">
                 {loading ? 
                     <div className='w-full h-full flex justify-center items-center'>
