@@ -35,11 +35,13 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                         <BiQuestionMark className='w-5 h-5 text-orange-300'></BiQuestionMark>
                         <p>Questions</p>
                     </div>
+                    <Link href="/admin/categories" className='w-full'>
+                        <div className={`navLink ${router.pathname.includes('/admin/categories') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                            <BiCategoryAlt className='w-5 h-5 text-orange-300'></BiCategoryAlt>
+                            <p>Categories</p>
+                        </div>
+                    </Link>
                     <div className='navLink'>
-                        <BiCategoryAlt className='w-5 h-5 text-orange-300'></BiCategoryAlt>
-                        <p>Categories</p>
-                    </div>
-                    <div className={`navLink ${router.pathname.includes('/settings') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
                         <TbUser className='w-5 h-5 text-orange-300'></TbUser>
                         <p>Users</p>
                     </div>

@@ -63,7 +63,7 @@ function AdminLayout({ children }: {children: JSX.Element | Array<JSX.Element>})
                         <div className='w-full h-full flex justify-center items-center'>
                             <AiOutlineLoading3Quarters className='w-10 h-10 text-primary-100 animate-spin'></AiOutlineLoading3Quarters>
                         </div> : 
-                        <div className='w-full h-full px-4'>
+                        <div className='w-full h-full px-4 md:py-4'>
                             {children}
                         </div>
                     }
