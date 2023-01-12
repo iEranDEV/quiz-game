@@ -32,6 +32,8 @@ function Register() {
                 username: username,
                 email: email,
                 role: 'USER',
+                friendRequests: Array<string>(),
+                friends: Array<string>(),
                 photoURL: userData.photoURL != null ? userData.photoURL : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png',
             }
             await setDoc(doc(db, "users", userData.uid), user).catch((error) => setError(error.code));

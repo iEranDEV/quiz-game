@@ -7,6 +7,8 @@ declare global {
         email: string,
         photoURL: string | null,
         role: 'USER' | 'ADMIN',
+        friendRequests: Array<string>,
+        friends: Array<string>
     }
 
     type INotification = {

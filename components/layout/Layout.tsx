@@ -48,10 +48,15 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
                 {loading ? 
                     <div className='w-full h-full flex justify-center items-center'>
                         <AiOutlineLoading3Quarters className='w-10 h-10 text-primary-100 animate-spin'></AiOutlineLoading3Quarters>
-                    </div> : 
-                    <div className='w-full h-full px-4'>
-                        {children}
-                    </div>
+                    </div> 
+                : 
+                    <div className='w-full h-full'>
+                        {user ?
+                            <div className='w-full h-full px-4'>{children}</div>
+                        :
+                            <div>test</div>
+                        }
+                    </div>       
                 }
             </div>
             <div className='w-full md:w-96 fixed right-0 bottom-0 flex flex-col-reverse p-2 gap-2'>

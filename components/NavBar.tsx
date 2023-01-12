@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { HiBars3, HiXMark } from "react-icons/hi2";
-import { TbBell, TbHome, TbSettings, TbUser, TbUsers, TbBulb } from "react-icons/tb";
+import { TbHome, TbSettings, TbUser, TbUsers, TbBulb } from "react-icons/tb";
 import { VscDashboard } from 'react-icons/vsc'
 
 function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user: User | null}) {
 
     const router = useRouter();
+
+    const friendsNotification = (user && user.friendRequests.length >= 1 ? true : false)
 
     return (
         <nav className="z-50 flex w-full md:w-auto items-center p-4 md:p-0">
@@ -26,11 +28,13 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                             <p>Home</p>
                         </div>
                     </Link>
-                    <div className='navLink'>
-                        <TbUsers className='w-5 h-5 text-orange-300'></TbUsers>
-                        <p>Friends</p>
-                        {/*<div className='h-4 p-1 bg-orange-300 rounded-full text-xs flex justify-center items-center text-primary-400'>100</div>*/}
-                    </div>
+                    <Link href="/friends" className="w-full">
+                        <div className={`navLink ${router.pathname === '/friends' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                            <TbUsers className='w-5 h-5 text-orange-300'></TbUsers>
+                            <p>Friends</p>
+                            {friendsNotification && <p className="bg-primary-200 text-stone-50 rounded-full p-1 text-xs">{user?.friendRequests.length}</p>}
+                        </div>
+                    </Link>
                     <div className='navLink'>
                         <TbUser className='w-5 h-5 text-orange-300'></TbUser>
                         <p>Profile</p>
