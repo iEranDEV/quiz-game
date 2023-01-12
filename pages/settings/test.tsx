@@ -1,10 +1,9 @@
 import { useState } from "react";
-import Layout from "../../components/Layout";
-import SettingsLayout from "../../components/SettingsLayout";
+import Layout from "../../components/layout/Layout";
+import SettingsLayout from "../../components/layout/SettingsLayout";
 
 
 function TestSettings() {
-    const [menu, setMenu] = useState(true);
 
     return (
         <Layout>

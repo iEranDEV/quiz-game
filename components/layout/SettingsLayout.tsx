@@ -4,8 +4,8 @@ import { useState } from "react";
 import { HiXMark } from "react-icons/hi2";
 import { TbUser, TbLockSquare, TbQuestionMark, TbShieldCheck, TbDiamond, TbLogout } from "react-icons/tb";
 import { useDispatch } from "react-redux";
-import { auth } from "../firebase";
-import { setUser } from "../store/userSlice";
+import { auth } from "../../firebase";
+import { setUser } from "../../store/userSlice";
 
 
 function SettingsLayout({ children }: {children: JSX.Element}) {

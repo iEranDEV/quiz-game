@@ -2,12 +2,12 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { auth, db } from '../firebase';
-import { RootState } from '../store/store';
-import { setLoading, setUser } from '../store/userSlice';
+import { auth, db } from '../../firebase';
+import { RootState } from '../../store/store';
+import { setLoading, setUser } from '../../store/userSlice';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import NavBar from './NavBar';
-import NotificationElement from './NotificationElement';
+import NavBar from '../NavBar';
+import NotificationElement from '../NotificationElement';
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
@@ -35,6 +35,7 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
                 }
             } else {
                 dispatch(setUser(null));
+                router.push('/accounts/login');
             }
         })
         return unsubscribe;

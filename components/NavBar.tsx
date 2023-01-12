@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { HiBars3, HiXMark } from "react-icons/hi2";
 import { TbBell, TbHome, TbSettings, TbUser, TbUsers, TbBulb } from "react-icons/tb";
+import { VscDashboard } from 'react-icons/vsc'
 
 function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user: User | null}) {
 
@@ -41,13 +42,15 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                         </div>
                     </Link>
                     <div className='navLink'>
-                        <TbBell className='w-5 h-5 text-orange-300'></TbBell>
-                        <p>Notifications</p>
-                    </div>
-                    <div className='navLink'>
                         <TbBulb className='w-5 h-5 text-orange-300'></TbBulb>
                         <p>Send an idea</p>
                     </div>
+                    {user?.role === 'ADMIN' && <Link href="/admin/" className='w-full'>
+                        <div className={`navLink ${router.pathname.includes('/admin') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                            <VscDashboard className='w-5 h-5 text-orange-300'></VscDashboard>
+                            <p>Dashboard</p>
+                        </div>
+                    </Link>}
                 </div>
                 {user && 
                     <div className='w-full flex items-center gap-2 justify-center text-sm md:hidden lg:flex'>
