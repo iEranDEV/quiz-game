@@ -13,7 +13,7 @@ function Notification({ id, type, message }: INotification) {
         }, 3000)
     }, [])
 
-    const style = (type === 'success' ? 'bg-green-500 border-green-600 text-stone-50' : (type === 'info') ? 'bg-red-300 border-red-400' : 'bg-orange-300 border-orange-400')
+    const style = (type === 'success' ? 'bg-green-500 border-green-600 text-stone-50' : (type === 'info') ? 'bg-red-300 border-red-500 text-red-500' : 'bg-orange-300 border-orange-400')
 
     return (
         <div className={`w-full ${style} border-2 rounded-xl px-4 py-2 flex gap-4 items-center animate-slideIn text-sm`}>

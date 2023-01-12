@@ -1,17 +1,23 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { MdOutlineAddCircle } from "react-icons/md";
+import { useDispatch } from "react-redux";
 import AdminLayout from "../../../components/admin/AdminLayout";
+import DeleteCategoryModal from "../../../components/admin/modal/DeleteCategoryModal";
+import EditCategoryModal from "../../../components/admin/modal/EditCategoryModal";
 import NewCategoryModal from "../../../components/admin/modal/NewCategoryModal";
 import Button from "../../../components/Button";
 import { db } from "../../../firebase";
+import { addNotification } from "../../../store/notificationsSlice";
 
 function AdminCategoriesList() {
     const [categories, setCategories] = useState(Array<Category>());
     const [newModal, setNewModal] = useState(false);
     const [editModal, setEditModal] = useState<Category | null>(null);
     const [deleteModal, setDeleteModal] = useState<Category | null>(null);
+
+    const dispatch = useDispatch();
 
     const getAllCategories = async () => {
         const arr = Array<Category>();
@@ -24,6 +30,28 @@ function AdminCategoriesList() {
 
     const addCategory = (category: Category) => {
         setCategories([...categories, category]);
+    }
+
+    const deleteCategory = () => {
+        if(deleteModal) {
+            const newCategories = [...categories];
+            newCategories.splice(newCategories.findIndex((element) => element.id === deleteModal.id), 1)
+            setCategories(newCategories);
+            deleteDoc(doc(db, "categories", deleteModal.id)).then(() => {
+                dispatch(addNotification({
+                    id: crypto.randomUUID(),
+                    type: 'info',
+                    message: `Deleted category with id ${deleteModal.id}!`
+                }))
+            });
+            setDeleteModal(null);
+        }
+    }
+
+    const editCategory = (category: Category) => {
+        const arr = [...categories];
+        arr[arr.findIndex(element => element.id === category.id)] = category;
+        setCategories(arr);
     }
 
     useEffect(() => {
@@ -47,7 +75,11 @@ function AdminCategoriesList() {
                             return (
                                 <div className="w-full flex py-2 px-2 justify-between hover:bg-primary-300/50 text-stone-50 items-center gap-4" key={category.id}>
                                     <div className="flex items-center gap-4">
-                                        <div className="h-8 w-8 rounded-2xl border-2 border-primary-100" style={{backgroundColor: category.color}}></div>
+                                        {category.photoURL ? 
+                                            <img src={category.photoURL} className="h-10 w-10"></img>
+                                        :
+                                            <div className="h-10 w-10"></div>
+                                        }
                                         <div className="w-60">
                                             {category.name}
                                         </div>
@@ -56,16 +88,24 @@ function AdminCategoriesList() {
                                         {category.description}
                                     </div>
                                     <div className="w-20 justify-around flex items-center">
-                                        <AiFillEdit className="w-5 h-5 text-orange-300 cursor-pointer"></AiFillEdit>
-                                        <AiFillDelete className="w-5 h-5 text-red-400 cursor-pointer"></AiFillDelete>
+                                        <AiFillEdit onClick={() => setEditModal(category)} className="w-5 h-5 text-orange-300 cursor-pointer"></AiFillEdit>
+                                        <AiFillDelete onClick={() => setDeleteModal(category)} className="w-5 h-5 text-red-400 cursor-pointer"></AiFillDelete>
                                     </div>
                                 </div>
                             )
                         })}
                     </div>    
                 }
+
                 {/* New category modal */}
                 {newModal && <NewCategoryModal addCategory={addCategory} newModal={newModal} setNewModal={setNewModal}></NewCategoryModal>}
+
+                {/* Delete category modal */}
+                {deleteModal != null && <DeleteCategoryModal deleteCategory={deleteCategory} setDeleteModal={setDeleteModal} category={deleteModal}></DeleteCategoryModal>}
+
+                {/* Edit category modal */}
+                {editModal != null && <EditCategoryModal editCategory={editCategory} setEditModal={setEditModal} category={editModal}></EditCategoryModal>}
+
             </div>
         </AdminLayout>
     )

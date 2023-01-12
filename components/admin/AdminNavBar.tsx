@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { HiBars3, HiXMark } from "react-icons/hi2";
-import { TbBulb, TbUser } from "react-icons/tb";
+import { TbBulb, TbHome, TbUser } from "react-icons/tb";
 import { BiCategoryAlt, BiQuestionMark } from 'react-icons/bi'
 import { VscDashboard } from 'react-icons/vsc'
 
@@ -45,6 +45,12 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                         <TbUser className='w-5 h-5 text-orange-300'></TbUser>
                         <p>Users</p>
                     </div>
+                    <Link href="/" className='w-full'>
+                        <div className={`navLink`}>
+                            <TbHome className='w-5 h-5 text-orange-300'></TbHome>
+                            <p>Home</p>
+                        </div>
+                    </Link>
                 </div>
                 {user && 
                     <div className='w-full flex items-center gap-2 justify-center text-sm md:hidden lg:flex'>

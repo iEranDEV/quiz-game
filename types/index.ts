@@ -19,7 +19,8 @@ declare global {
         id: string,
         name: string,
         description: string,
-        color: string
+        color: string,
+        photoURL: string | null,
     }
     
     type Question = {

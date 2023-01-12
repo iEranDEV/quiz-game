@@ -1,7 +1,7 @@
-import { doc, setDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRef, useState } from "react";
-import { MdDriveFileRenameOutline, MdOutlineAddCircle, MdOutlineColorLens, MdPhotoCameraBack } from "react-icons/md";
+import { MdDriveFileRenameOutline, MdOutlineColorLens, MdOutlineUpdate, MdPhotoCameraBack } from "react-icons/md";
 import { TbFileDescription } from "react-icons/tb";
 import { useDispatch } from "react-redux";
 import { db, storage } from "../../../firebase";
@@ -9,10 +9,10 @@ import { addNotification } from "../../../store/notificationsSlice";
 import Button from "../../Button";
 import Modal from "../../modal/Modal";
 
-function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boolean, setNewModal: Function, addCategory: Function}) {
-    const [color, setColor] = useState('#778da9');
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('')
+function EditCategoryModal({ category, setEditModal, editCategory }: {category: Category, setEditModal: Function, editCategory: Function}) {
+    const [color, setColor] = useState(category.color);
+    const [name, setName] = useState(category.name);
+    const [description, setDescription] = useState(category.description);
 
     const colorRef = useRef(null);
     const photoRef = useRef(null);
@@ -20,12 +20,12 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const category: Category = {
-            id: crypto.randomUUID(),
+        const newCategory: Category = {
+            id: category.id,
             name: name,
             description: description, 
             color: color,
-            photoURL: null
+            photoURL: category.photoURL,
         }
 
         // Handle photo
@@ -37,32 +37,27 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
                 })
             });
             console.log(url);
-            category.photoURL = url;
+            newCategory.photoURL = url;
         }
 
-        // Add category to DB
-        await setDoc(doc(db, "categories", category.id), category).then(() => {
-            setNewModal(false);
-            addCategory(category);
-            // Add notification
+        await updateDoc(doc(db, "categories", category.id), {
+            name: name,
+            description: description, 
+            color: color,
+            photoURL: newCategory.photoURL
+        }).then(() => {
+            editCategory(newCategory);
             dispatch(addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
-                message: `Added new category with id ${category.id}!`
+                message: `Successfully updated category!`
             }))
-        }).catch((error) => {
-            setNewModal(false);
-            // Ad notification
-            dispatch(addNotification({
-                id: crypto.randomUUID(),
-                type: 'error',
-                message: `An error occured!`
-            }))
-        });
+            setEditModal(null);
+        })
     }
 
     return (
-        <Modal toggleMenu={() => setNewModal(!newModal)}>
+        <Modal toggleMenu={() => setEditModal(null)}>
             <form onSubmit={(e) => handleSubmit(e)} className="w-full h-full flex flex-col gap-8">
 
                 {/* Category name */}
@@ -101,9 +96,9 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
                         <input type="color" name="color" id="color" className="w-0 opacity-0" ref={colorRef} value={color} onChange={(e) => setColor(e.target.value)} />
                     </div>
 
-                    <Button onClick={() => setNewModal(true)} bgColor="bg-green-500" shadowColor="shadow-green-700" width={'w-auto'}>
-                        <MdOutlineAddCircle className="h-5 w-5 text-green-700"></MdOutlineAddCircle>
-                        <p>Create</p>
+                    <Button bgColor="bg-green-500" shadowColor="shadow-green-700" width={'w-auto'}>
+                        <MdOutlineUpdate className="h-5 w-5 text-green-700"></MdOutlineUpdate>
+                        <p>Update</p>
                     </Button>
                 </div>
             </form>
@@ -111,4 +106,4 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
     )
 }
 
-export default NewCategoryModal;
+export default EditCategoryModal;
