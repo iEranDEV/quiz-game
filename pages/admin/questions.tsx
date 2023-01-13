@@ -17,6 +17,7 @@ function AdminQuestionsList() {
     const [newModal, setNewModal] = useState(false);
     const [editModal, setEditModal] = useState<Question | null>(null);
     const [deleteModal, setDeleteModal] = useState<Question | null>(null);
+    const [searchQuery, setSearchQuery] = useState('all');
 
     const dispatch = useDispatch();
 
@@ -64,6 +65,14 @@ function AdminQuestionsList() {
         setQuestions(arr);
     }
 
+    const structure = () => {
+        if(searchQuery === 'all') {
+            return [...questions];
+        } else {
+            return [...questions].filter(element => element.category === searchQuery);
+        }
+    }
+
     useEffect(() => {
         getAllCategories();
         getAllQuestions();
@@ -71,7 +80,7 @@ function AdminQuestionsList() {
 
     return (
         <AdminLayout>
-            <div className="w-full h-full flex flex-col gap-16">
+            <div className="w-full h-full flex flex-col gap-8">
                 <div className="w-full flex justify-between items-center">
                     <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Questions ({questions.length})</p>
                     <Button onClick={() => setNewModal(true)} bgColor="bg-green-500" shadowColor="shadow-green-700" width={'aspect-square md:w-60 md:aspect-auto'}>
@@ -80,15 +89,32 @@ function AdminQuestionsList() {
                     </Button>
                 </div>
 
+                <div className="w-full flex gap-4 items-center">
+                    <p className="text-orange-300 uppercase font-bold text-sm">Filter by</p>
+                    <select value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-40 appearance-none rounded-xl px-2 py-1 text-stone-50 bg-primary-200 border-2 border-primary-100">
+                        <option value="all">All categories</option>
+                        {categories.map((category) => {
+                            return (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                            )
+                        })}
+                    </select>
+                </div>
+
                 {questions && 
                     <div className="w-full flex flex-col divide-y divide-primary-100">
-                        {questions.map((question) => {
+                        <div className="w-full flex py-2 px-2 justify-between hover:bg-primary-300/50 text-stone-50 items-center gap-4">
+                            <div className="w-60 truncate text-orange-300 uppercase font-bold text-sm">Name</div>
+                            <div className="w-60 text-orange-300 uppercase font-bold text-sm">Category</div>
+                            <div className="w-20"></div>
+                        </div>
+                        {structure().map((question) => {
                             return (
                                 <div className="w-full flex py-2 px-2 justify-between hover:bg-primary-300/50 text-stone-50 items-center gap-4" key={question.id}>
-                                    <div className="w-60">
+                                    <div className="w-60 truncate">
                                         {question.question}
                                     </div>
-                                    <div className="w-60 truncate hidden md:block text-primary-100">
+                                    <div className="w-60 text-primary-100">
                                         {categories.find(element => element.id === question.category)?.name}
                                     </div>
                                     <div className="w-20 justify-around flex items-center">
