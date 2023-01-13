@@ -9,6 +9,7 @@ import Button from "../../../Button";
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import Modal from "../../../modal/Modal";
 import { AiOutlineCheck } from "react-icons/ai";
+import SelectList from "../../../SelectList";
 
 function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {newModal: boolean, setNewModal: Function, addQuestion: Function, categories: Array<Category>}) {
     const [question, setQuestion] = useState('');
@@ -78,6 +79,17 @@ function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {n
         setAnswers(newAnswers);
     }
 
+    const formatArray = (arr: Array<Category>) => {
+        const toReturn = Array<{ value: string, name: string}>()
+        arr.forEach((item) => {
+            toReturn.push({
+                value: item.id,
+                name: item.name
+            })
+        })
+        return toReturn;
+    }
+
     return (
         <Modal toggleMenu={() => setNewModal(!newModal)}>
             <form onSubmit={(e) => handleSubmit(e)} className="w-full h-full flex flex-col gap-8">
@@ -107,13 +119,7 @@ function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {n
 
                 {/* Category select */}
                 <div className="w-full flex flex-col gap-2 relative">
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full appearance-none rounded-xl p-2 text-stone-50 bg-primary-200 border border-primary-300">
-                        {categories.map((category) => {
-                            return (
-                                <option key={category.id} value={category.id}>{category.name}</option>
-                            )
-                        })}
-                    </select>
+                    <SelectList values={formatArray([...categories])} onChange={(val: string) => setCategory(val)}></SelectList>
                 </div>
 
                 {/* Question image */}

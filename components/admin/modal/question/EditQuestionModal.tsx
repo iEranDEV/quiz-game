@@ -9,6 +9,7 @@ import Button from "../../../Button";
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import Modal from "../../../modal/Modal";
 import { AiOutlineCheck } from "react-icons/ai";
+import SelectList from "../../../SelectList";
 
 function EditCategoryModal({ questionObject, setEditModal, editQuestion, categories }: {questionObject: Question, setEditModal: Function, editQuestion: Function, categories: Array<Category>}) {
     const [question, setQuestion] = useState(questionObject.question);
@@ -78,6 +79,17 @@ function EditCategoryModal({ questionObject, setEditModal, editQuestion, categor
         setAnswers(newAnswers);
     }
 
+    const formatArray = (arr: Array<Category>) => {
+        const toReturn = Array<{ value: string, name: string}>()
+        arr.forEach((item) => {
+            toReturn.push({
+                value: item.id,
+                name: item.name
+            })
+        })
+        return toReturn;
+    }
+
     return (
         <Modal toggleMenu={() => setEditModal(null)}>
             <form onSubmit={(e) => handleSubmit(e)} className="w-full h-full flex flex-col gap-8">
@@ -107,13 +119,7 @@ function EditCategoryModal({ questionObject, setEditModal, editQuestion, categor
 
                 {/* Category select */}
                 <div className="w-full flex flex-col gap-2 relative">
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full appearance-none rounded-xl p-2 text-stone-50 bg-primary-200 border border-primary-300">
-                        {categories.map((category) => {
-                            return (
-                                <option key={category.id} value={category.id}>{category.name}</option>
-                            )
-                        })}
-                    </select>
+                    <SelectList values={formatArray([...categories])} onChange={(val: string) => setCategory(val)}></SelectList>
                 </div>
 
                 {/* Question image */}
@@ -128,7 +134,7 @@ function EditCategoryModal({ questionObject, setEditModal, editQuestion, categor
 
                     <Button bgColor="bg-green-500" shadowColor="shadow-green-700" width={'w-auto'}>
                         <MdOutlineAddCircle className="h-5 w-5 text-green-700"></MdOutlineAddCircle>
-                        <p>Create</p>
+                        <p>Update</p>
                     </Button>
                 </div>
             </form>
