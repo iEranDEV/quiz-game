@@ -36,7 +36,7 @@ function FriendsPage() {
             <div onClick={() => setRequestMenu(false)} className="w-full h-full min-h-[80vh] py-4 flex flex-col">
                 <div className="w-full flex flex-col gap-2">
                     <div className="w-full flex justify-between items-center relative">
-                        <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Friends</p>
+                        <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Friends ({user?.friends.length})</p>
                         <div onClick={(e) => toggleMenu(e)} className="relative">
                             <FaUserFriends className="text-primary-100 h-8 w-8 cursor-pointer"></FaUserFriends>
                             {friendsNotification && <div className="h-2 w-2 bg-orange-300 absolute top-0 right-0 rounded-full"></div>}

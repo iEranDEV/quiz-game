@@ -4,10 +4,10 @@ import { useRef, useState } from "react";
 import { MdDriveFileRenameOutline, MdOutlineAddCircle, MdOutlineColorLens, MdPhotoCameraBack } from "react-icons/md";
 import { TbFileDescription } from "react-icons/tb";
 import { useDispatch } from "react-redux";
-import { db, storage } from "../../../firebase";
-import { addNotification } from "../../../store/notificationsSlice";
-import Button from "../../Button";
-import Modal from "../../modal/Modal";
+import { db, storage } from "../../../../firebase";
+import { addNotification } from "../../../../store/notificationsSlice";
+import Button from "../../../Button";
+import Modal from "../../../modal/Modal";
 
 function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boolean, setNewModal: Function, addCategory: Function}) {
     const [color, setColor] = useState('#778da9');

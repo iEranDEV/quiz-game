@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { MdOutlineAddCircle } from "react-icons/md";
 import { useDispatch } from "react-redux";
-import AdminLayout from "../../../components/admin/AdminLayout";
-import DeleteCategoryModal from "../../../components/admin/modal/DeleteCategoryModal";
-import EditCategoryModal from "../../../components/admin/modal/EditCategoryModal";
-import NewCategoryModal from "../../../components/admin/modal/NewCategoryModal";
-import Button from "../../../components/Button";
-import { db } from "../../../firebase";
-import { addNotification } from "../../../store/notificationsSlice";
+import AdminLayout from "../../components/admin/AdminLayout";
+import DeleteCategoryModal from "../../components/admin/modal/category/DeleteCategoryModal";
+import EditCategoryModal from "../../components/admin/modal/category/EditCategoryModal";
+import NewCategoryModal from "../../components/admin/modal/category/NewCategoryModal";
+import Button from "../../components/Button";
+import { db } from "../../firebase";
+import { addNotification } from "../../store/notificationsSlice";
 
 function AdminCategoriesList() {
     const [categories, setCategories] = useState(Array<Category>());
@@ -62,7 +62,7 @@ function AdminCategoriesList() {
         <AdminLayout>
             <div className="w-full h-full flex flex-col gap-16">
                 <div className="w-full flex justify-between items-center">
-                    <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Categories</p>
+                    <p className="text-primary-100 tracking-widest uppercase font-bold text-xl">Categories ({categories.length})</p>
                     <Button onClick={() => setNewModal(true)} bgColor="bg-green-500" shadowColor="shadow-green-700" width={'aspect-square md:w-60 md:aspect-auto'}>
                         <MdOutlineAddCircle className="h-5 w-5 text-green-700"></MdOutlineAddCircle>
                         <p className="hidden md:block">Add new category</p>

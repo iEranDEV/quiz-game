@@ -29,9 +29,9 @@ declare global {
         id: string,
         category: string,
         question: string,
-        mediaURL: string,
+        mediaURL: string | null,
         answers: Array<Answer>,
-        currentAnswer: string,
+        correctAnswer: string,
     }
 
     type Answer = {

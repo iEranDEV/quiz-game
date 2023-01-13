@@ -54,7 +54,7 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
                         {user ?
                             <div className='w-full h-full px-4'>{children}</div>
                         :
-                            <div>test</div>
+                            <div></div>
                         }
                     </div>       
                 }

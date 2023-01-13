@@ -31,12 +31,14 @@ function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user
                         <TbBulb className='w-5 h-5 text-orange-300'></TbBulb>
                         <p>Ideas</p>
                     </div>
-                    <div className='navLink'>
-                        <BiQuestionMark className='w-5 h-5 text-orange-300'></BiQuestionMark>
-                        <p>Questions</p>
-                    </div>
+                    <Link href="/admin/questions" className='w-full'>
+                        <div className={`navLink ${router.pathname === '/admin/questions' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                            <BiQuestionMark className='w-5 h-5 text-orange-300'></BiQuestionMark>
+                            <p>Questions</p>
+                        </div>
+                    </Link>
                     <Link href="/admin/categories" className='w-full'>
-                        <div className={`navLink ${router.pathname.includes('/admin/categories') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                        <div className={`navLink ${router.pathname === '/admin/categories' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
                             <BiCategoryAlt className='w-5 h-5 text-orange-300'></BiCategoryAlt>
                             <p>Categories</p>
                         </div>
