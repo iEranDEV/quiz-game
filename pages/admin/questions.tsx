@@ -8,6 +8,7 @@ import DeleteQuestionModal from "../../components/admin/modal/question/DeleteQue
 import EditQuestionModal from "../../components/admin/modal/question/EditQuestionModal";
 import NewQuestionModal from "../../components/admin/modal/question/NewQuestionModal";
 import Button from "../../components/Button";
+import SelectList from "../../components/SelectList";
 import { db } from "../../firebase";
 import { addNotification } from "../../store/notificationsSlice";
 
@@ -78,6 +79,13 @@ function AdminQuestionsList() {
         getAllQuestions();
     }, []);
 
+    const searchArray = () => {
+        const arr = Array<{value: string, name: string}>();
+        arr.push({value: 'all', name: 'All categories'});
+        categories.forEach((item) => arr.push({value: item.id, name: item.name}));
+        return arr;
+    }
+
     return (
         <AdminLayout>
             <div className="w-full h-full flex flex-col gap-8">
@@ -91,14 +99,9 @@ function AdminQuestionsList() {
 
                 <div className="w-full flex gap-4 items-center">
                     <p className="text-orange-300 uppercase font-bold text-sm">Filter by</p>
-                    <select value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-40 appearance-none rounded-xl px-2 py-1 text-stone-50 bg-primary-200 border-2 border-primary-100">
-                        <option value="all">All categories</option>
-                        {categories.map((category) => {
-                            return (
-                                <option key={category.id} value={category.id}>{category.name}</option>
-                            )
-                        })}
-                    </select>
+                    <div className="w-60">
+                        <SelectList values={searchArray()} onChange={(val: string) => setSearchQuery(val)}></SelectList>
+                    </div>
                 </div>
 
                 {questions && 
