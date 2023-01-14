@@ -1,17 +1,15 @@
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { TbCheck, TbMoodEmpty, TbX } from "react-icons/tb";
-import { useDispatch } from "react-redux";
 import { AuthContext } from "../../context/AuthContext";
+import { NotificationContext } from "../../context/NotificationContext";
 import { db } from "../../firebase";
-import { addNotification } from "../../store/notificationsSlice";
-import { setUser } from "../../store/userSlice";
 import Button from "../Button";
 
 function Requests({ setMenu }: { setMenu: Function }) {
     const [requests, setRequests] = useState(Array<User>());
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
     const authContext = useContext(AuthContext);
     const user = authContext.user;
 
@@ -43,11 +41,11 @@ function Requests({ setMenu }: { setMenu: Function }) {
         })
         authContext.setUser(newUser);
         syncData();
-        dispatch(addNotification({
+        notificationContext.addNotification({
             id: crypto.randomUUID(),
             type: 'success',
             message: `${request.username} is now your friend!`
-        }))
+        })
         setMenu(false);
     }
 

@@ -20,13 +20,11 @@ export const AuthContextProvider = ({ children }: {children: JSX.Element}) => {
 
     // Function for setting user state
     const setUser = (user: User | null) => {
-        console.log('changed user state')
         setUserState(user);
     }
 
     // Function for setting loading state
     const setLoading = (loading: boolean) => {
-        console.log('changed loading state')
         setLoadingState(loading);
     }
 

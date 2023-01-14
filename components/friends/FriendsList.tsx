@@ -1,16 +1,14 @@
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { useEffect, useState, useContext } from "react";
 import { TbMoodCry, TbUserExclamation, TbUserPlus, TbUserX } from "react-icons/tb";
-import { useDispatch } from "react-redux";
 import { AuthContext } from "../../context/AuthContext";
+import { NotificationContext } from "../../context/NotificationContext";
 import { db } from "../../firebase";
-import { addNotification } from "../../store/notificationsSlice";
-import { setUser } from "../../store/userSlice";
 
 function FriendsList({ searchQuery }: { searchQuery: string | null }) {
     const [results, setResults] = useState(Array<User>());
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
     const authContext = useContext(AuthContext);
     const user = authContext.user;
 
@@ -49,11 +47,11 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                 friendRequests: arrayUnion(user.uid),
             }).then(() => {
                 syncData();
-                dispatch( addNotification({
+                notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'success',
                     message: `Sent friend request to ${resultCopy.username}!`
-                }))
+                })
             })
         }
     }
@@ -65,32 +63,32 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                 friendRequests: arrayRemove(user.uid)
             }).then(() => {
                 syncData();
-                dispatch(addNotification({
+                notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'info',
                     message: `Canceled friend request to ${resultCopy.username}!`
-                }))
+                })
             })
         }
     }
 
     const removeFriend = async (result: User) => {
         if(user) {
-            let resultCopy = JSON.parse(JSON.stringify(result)) as User;
-            resultCopy.friends.splice(resultCopy.friends.findIndex(element => element === resultCopy.uid), 1);
-            authContext.setUser(resultCopy);
+            let userCopy = JSON.parse(JSON.stringify(user)) as User;
+            userCopy.friends.splice(userCopy.friends.findIndex(element => element === result.uid), 1);
+            authContext.setUser(userCopy);
             await updateDoc(doc(db, "users", user.uid), {
-                friends: arrayRemove(resultCopy.uid)
+                friends: arrayRemove(result.uid)
             })
-            await updateDoc(doc(db, "users", resultCopy.uid), {
+            await updateDoc(doc(db, "users", result.uid), {
                 friends: arrayRemove(user.uid)
             })
             syncData();
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'info',
-                message: `Removed ${resultCopy.username} from friends!`
-            }))
+                message: `Removed ${result.username} from friends!`
+            })
         }
     }
 

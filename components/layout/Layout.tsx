@@ -3,11 +3,8 @@ import { useContext, useState } from 'react';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import NavBar from '../NavBar';
 import NotificationElement from '../NotificationElement';
-import io, { Socket } from "socket.io-client";
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { AuthContext } from '../../context/AuthContext';
 import { NotificationContext } from '../../context/NotificationContext';
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
@@ -18,27 +15,6 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const user = authContext.user;
     const loading = authContext.loading
     const notifications = notificationContext.notifications;
-    console.log(notifications)
-
-    /*useEffect(() => {
-        if(user) {
-            const socketInitializer = async () => {
-                console.log(user?.uid);
-                await fetch('/api/socket?uid=' + user?.uid);
-                socket = io();
-    
-                socket.on('connect', () => {
-                    console.log('client - connected')
-                })
-
-                socket.on('friends-activity', () => {
-                    
-                })
-
-            }
-            socketInitializer();
-        }
-    }, [user]);*/
 
     return (
         <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">
