@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { useContext } from 'react';
 import { useRouter } from "next/router";
 import { HiBars3, HiXMark } from "react-icons/hi2";
 import { TbBulb, TbHome, TbUser } from "react-icons/tb";
 import { BiCategoryAlt, BiQuestionMark } from 'react-icons/bi'
 import { VscDashboard } from 'react-icons/vsc'
+import { AuthContext } from "../../context/AuthContext";
 
-function NavBar({ menu, setMenu, user }: {menu: boolean, setMenu: Function, user: User | null}) {
+function NavBar({ menu, setMenu }: {menu: boolean, setMenu: Function}) {
 
     const router = useRouter();
+    const authContext = useContext(AuthContext);
+    const user = authContext.user;
 
     return (
         <nav className="z-50 flex w-full md:w-auto items-center p-4 md:p-0">

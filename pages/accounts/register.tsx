@@ -5,12 +5,11 @@ import { MdAlternateEmail } from 'react-icons/md';
 import Link from 'next/link';
 import { HiXMark } from 'react-icons/hi2'
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useContext } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from '../../firebase'
 import { doc, setDoc } from "firebase/firestore";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../store/userSlice";
+import { AuthContext } from "../../context/AuthContext";
 
 function Register() {
     const [email, setEmail] = useState('');
@@ -20,7 +19,7 @@ function Register() {
     const [error, setError] = useState(null);
 
     const router = useRouter();
-    const dispatch = useDispatch();
+    const authContext = useContext(AuthContext);
 
     const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -37,7 +36,7 @@ function Register() {
                 photoURL: userData.photoURL != null ? userData.photoURL : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png',
             }
             await setDoc(doc(db, "users", userData.uid), user).catch((error) => setError(error.code));
-            dispatch(setUser(user));
+            authContext.setUser(user);
             router.push('/');
         }).catch((error) => {
             setError(error.code);

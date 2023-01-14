@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { FaUserFriends } from "react-icons/fa";
 import { TbSearch } from "react-icons/tb";
-import { useSelector } from "react-redux";
 import FriendsList from "../components/friends/FriendsList";
 import Requests from "../components/friends/Requests";
 import Layout from "../components/layout/Layout";
-import { RootState } from "../store/store";
-
+import { AuthContext } from "../context/AuthContext";
 function FriendsPage() {
     const [requestMenu, setRequestMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string | null>('');
-    const user = useSelector((state: RootState) => state.user.user);
+
+    const authContext = useContext(AuthContext);
+    const user = authContext.user;
     const friendsNotification = (user && user.friendRequests.length >= 1 ? true : false);
 
     const toggleMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -42,14 +42,14 @@ function FriendsPage() {
                             {friendsNotification && <div className="h-2 w-2 bg-orange-300 absolute top-0 right-0 rounded-full"></div>}
                         </div>
 
-                        {(requestMenu && user) && <Requests user={user} setMenu={setRequestMenu}></Requests>}
+                        {(requestMenu && user) && <Requests setMenu={setRequestMenu}></Requests>}
                     </div>
                     <form onSubmit={(e) => handleSubmit(e)} className="w-full md:w-60 h-10 flex items-center gap-4">
                         <button type="submit"><TbSearch className="text-primary-100 cursor-pointer hover:text-primary-300 w-5 h-5"></TbSearch></button>
                         <input type="text" className="form-control" placeholder="Find a friend" ref={searchRef} />
                     </form>
                 </div>
-                {user && <FriendsList searchQuery={searchQuery} user={user}></FriendsList>}
+                {user && <FriendsList searchQuery={searchQuery}></FriendsList>}
             </div>
         </Layout>
     )

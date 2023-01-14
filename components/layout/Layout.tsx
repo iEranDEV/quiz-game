@@ -1,6 +1,6 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { auth, db } from '../../firebase';
 import { RootState } from '../../store/store';
@@ -10,41 +10,19 @@ import NavBar from '../NavBar';
 import NotificationElement from '../NotificationElement';
 import io, { Socket } from "socket.io-client";
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { AuthContext } from '../../context/AuthContext';
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
 
-    const router = useRouter();
-    const dispatch = useDispatch();
+    const authContext = useContext(AuthContext);
 
-    const user = useSelector((state: RootState) => state.user.user);
-    const loading = useSelector((state: RootState) => state.user.loading);
+    const user = authContext.user;
+    const loading = authContext.loading
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
 
-    useEffect(() => {
-        const authSession = auth.onAuthStateChanged(async (data) => {
-            console.log(data)
-            if(data) {
-                dispatch(setLoading(true));
-                const userSnap = await getDoc(doc(db, "users", data.uid));
-                if(userSnap.exists()) {
-                    dispatch(setUser(userSnap.data() as User));
-                    dispatch(setLoading(false));
-                } else {
-                    router.push('/accounts/login');
-                    dispatch(setLoading(false));
-                    dispatch(setUser(null));
-                }
-            } else {
-                dispatch(setUser(null));
-                router.push('/accounts/login');
-            }
-        })
-        return authSession;
-    }, [])
-
-    useEffect(() => {
+    /*useEffect(() => {
         if(user) {
             const socketInitializer = async () => {
                 console.log(user?.uid);
@@ -55,14 +33,18 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
                     console.log('client - connected')
                 })
 
+                socket.on('friends-activity', () => {
+                    
+                })
+
             }
             socketInitializer();
         }
-    }, [user]);
+    }, [user]);*/
 
     return (
         <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">
-            <NavBar menu={menu} setMenu={setMenu} user={user}></NavBar>
+            <NavBar menu={menu} setMenu={setMenu}></NavBar>
             <div className="w-full text-stone-50">
                 {loading ? 
                     <div className='w-full h-full flex justify-center items-center'>

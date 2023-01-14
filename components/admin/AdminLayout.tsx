@@ -1,51 +1,28 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState, useContext } from 'react';
+import { useSelector } from 'react-redux';
 import { auth, db } from '../../firebase';
 import { RootState } from '../../store/store';
-import { setLoading, setUser } from '../../store/userSlice';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import AdminNavBar from './AdminNavBar';
 import NotificationElement from '../NotificationElement';
+import { AuthContext } from '../../context/AuthContext';
 
 function AdminLayout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
-
+    const authContext = useContext(AuthContext);
     const router = useRouter();
-    const dispatch = useDispatch();
 
-    const user = useSelector((state: RootState) => state.user.user);
-    const loading = useSelector((state: RootState) => state.user.loading);
+    const user = authContext.user;
+    const loading = authContext.loading;
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(async (data) => {
-            console.log(data)
-            if(data) {
-                dispatch(setLoading(true));
-                const userSnap = await getDoc(doc(db, "users", data.uid));
-                if(userSnap.exists()) {
-                    if((userSnap.data() as User).role !== 'ADMIN') {
-                        router.push('/');
-                        dispatch(setLoading(false));
-                        dispatch(setUser(null));
-                    } else {
-                        dispatch(setUser(userSnap.data() as User));
-                        dispatch(setLoading(false));
-                    }
-                } else {
-                    router.push('/accounts/login');
-                    dispatch(setLoading(false));
-                    dispatch(setUser(null));
-                }
-            } else {
-                dispatch(setUser(null));
-                router.push('/accounts/login');
-            }
-        })
-        return unsubscribe;
-    }, [])
+        if(user?.role !== 'ADMIN') {
+            router.push('/');
+        }
+    }, [user])
 
     const authorized = () => {
         if(user) {
@@ -57,7 +34,7 @@ function AdminLayout({ children }: {children: JSX.Element | Array<JSX.Element>})
     return (
         <>
             {authorized() && <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">
-                <AdminNavBar menu={menu} setMenu={setMenu} user={user}></AdminNavBar>
+                <AdminNavBar menu={menu} setMenu={setMenu}></AdminNavBar>
                 <div className="w-full text-stone-50">
                     {loading ? 
                         <div className='w-full h-full flex justify-center items-center'>

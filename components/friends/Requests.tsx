@@ -1,28 +1,29 @@
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TbCheck, TbMoodEmpty, TbX } from "react-icons/tb";
 import { useDispatch } from "react-redux";
+import { AuthContext } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import { addNotification } from "../../store/notificationsSlice";
 import { setUser } from "../../store/userSlice";
 import Button from "../Button";
 
-type RequestsProps = {
-    user: User,
-    setMenu: Function
-}
-
-function Requests({user, setMenu}: RequestsProps) {
+function Requests({ setMenu }: { setMenu: Function }) {
     const [requests, setRequests] = useState(Array<User>());
+
     const dispatch = useDispatch();
+    const authContext = useContext(AuthContext);
+    const user = authContext.user;
 
     const syncData = async () => {
-        let arr = Array<User>();
-        for (const friend of user.friendRequests) {
-            const friendSnap = await getDoc(doc(db, "users", friend));
-            if(friendSnap.exists()) arr.push(friendSnap.data() as User);
+        if(user) {
+            let arr = Array<User>();
+            for (const friend of user.friendRequests) {
+                const friendSnap = await getDoc(doc(db, "users", friend));
+                if(friendSnap.exists()) arr.push(friendSnap.data() as User);
+            }
+            setRequests(arr);
         }
-        setRequests(arr);
     }
     
     useEffect(() => {
@@ -40,7 +41,7 @@ function Requests({user, setMenu}: RequestsProps) {
         await updateDoc(doc(db, "users", request.uid), {
             friends: arrayUnion(user?.uid),
         })
-        dispatch(setUser(newUser));
+        authContext.setUser(newUser);
         syncData();
         dispatch(addNotification({
             id: crypto.randomUUID(),
@@ -51,14 +52,16 @@ function Requests({user, setMenu}: RequestsProps) {
     }
 
     const declineRequest = async (request: User) => {
-        const newUser = JSON.parse(JSON.stringify(user)) as User;
-        newUser.friendRequests.splice(newUser.friendRequests.findIndex(element => element === request.uid), 1);
-        await updateDoc(doc(db, "users", user.uid), {
-            friendRequests: arrayRemove(request.uid)
-        })
-        dispatch(setUser(newUser));
-        syncData();
-        setMenu(false);
+        if(user) {
+            const newUser = JSON.parse(JSON.stringify(user)) as User;
+            newUser.friendRequests.splice(newUser.friendRequests.findIndex(element => element === request.uid), 1);
+            await updateDoc(doc(db, "users", user.uid), {
+                friendRequests: arrayRemove(request.uid)
+            })
+            authContext.setUser(newUser);
+            syncData();
+            setMenu(false);
+        }
     }
 
     const friendsNotification = (user && user.friendRequests.length >= 1 ? true : false);

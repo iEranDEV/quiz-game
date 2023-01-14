@@ -1,22 +1,22 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { HiXMark } from "react-icons/hi2";
 import { TbUser, TbLockSquare, TbQuestionMark, TbShieldCheck, TbDiamond, TbLogout } from "react-icons/tb";
-import { useDispatch } from "react-redux";
+import { AuthContext } from "../../context/AuthContext";
 import { auth } from "../../firebase";
-import { setUser } from "../../store/userSlice";
 
 
 function SettingsLayout({ children }: {children: JSX.Element}) {
     const [menu, setMenu] = useState(false);
 
     const router = useRouter();
-    const dispatch = useDispatch();
+    const authContext = useContext(AuthContext);
 
     const handleLogOut = () => {
         auth.signOut().then(() => {
-            dispatch(setUser(null));
+
+            authContext.setUser(null);
             router.push('/accounts/login');
         }).catch((error) => {
             console.log(error);

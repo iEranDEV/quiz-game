@@ -1,16 +1,16 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useContext } from "react";
 import { BiUser, BiImage, BiTrash } from "react-icons/bi";
 import { MdLibraryAddCheck } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Button from "../../components/Button";
 import Layout from "../../components/layout/Layout";
 import SettingsLayout from "../../components/layout/SettingsLayout";
+import { AuthContext } from "../../context/AuthContext";
 import { db, storage } from "../../firebase";
 import { addNotification } from "../../store/notificationsSlice";
-import { RootState } from "../../store/store";
 import { setUser } from "../../store/userSlice";
 
 
@@ -19,8 +19,9 @@ function UserSettings() {
     const [file, setFile] = useState<File | null>(null);
     const [photo, setPhoto] = useState<null | string>();
 
-    const user = useSelector((state: RootState) => state.user.user);
     const dispatch = useDispatch();
+    const authContext = useContext(AuthContext);
+    const user = authContext.user;
     const router = useRouter();
     const fileRef = useRef(null);
 
@@ -62,7 +63,7 @@ function UserSettings() {
             let newUser = {...user} as User;
             newUser.username = username as string;
             newUser.photoURL = (url != null ? url : photo);
-            dispatch(setUser(newUser));
+            authContext.setUser(newUser);
             router.push('/')
             dispatch(addNotification({
                 id: crypto.randomUUID(),

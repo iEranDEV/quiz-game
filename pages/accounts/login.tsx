@@ -4,21 +4,21 @@ import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import { MdAlternateEmail } from 'react-icons/md';
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useContext } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../store/userSlice";
 import { HiXMark } from "react-icons/hi2";
+import { AuthContext } from "../../context/AuthContext";
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+
+    const authContext = useContext(AuthContext);
     
     const router = useRouter();
-    const dispatch = useDispatch();
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -26,7 +26,7 @@ function Login() {
             const userData = userCredentials.user;
             const userSnap = await getDoc(doc(db, "users", userData.uid));
             if(userSnap.exists()) {
-                dispatch(setUser(userSnap.data() as User));
+                authContext.setUser(userSnap.data() as User);
                 router.push('/');
             } else setError('user not found' as any);
         }).catch((error) => {

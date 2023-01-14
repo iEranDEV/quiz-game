@@ -1,13 +1,11 @@
+import { doc, getDoc } from 'firebase/firestore';
 import { Server } from 'socket.io';
+import { db } from '../../firebase';
 
 const users = new Map<string, string>();
 
 const SocketHandler = (req: any, res: any) => {
-    // console.log(req.query.uid);
-    if(res.socket.server.io) {
-        console.log('Socket is already running')
-    } else {
-        console.log('Socket is initializing');
+    if(!res.socket.server.io) {
         const io = new Server(res.socket.server);
         res.socket.server.io = io;
 
@@ -19,6 +17,18 @@ const SocketHandler = (req: any, res: any) => {
 
             socket.on('disconnect', () => {
                 users.delete(uid);
+            })
+
+            socket.on('get-friends-activity', async () => {
+                const arr = Array<string>();
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if(docSnap.exists()) {
+                    const user = docSnap.data() as User;
+                    user.friends.forEach((element) => {
+                        if(users.has(element)) arr.push(element);
+                    })
+                }
+                socket.emit('friends-activity', arr);
             })
         })
     }
