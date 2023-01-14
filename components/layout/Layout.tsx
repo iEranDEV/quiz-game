@@ -8,6 +8,9 @@ import { setLoading, setUser } from '../../store/userSlice';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import NavBar from '../NavBar';
 import NotificationElement from '../NotificationElement';
+import io, { Socket } from "socket.io-client";
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
@@ -20,7 +23,7 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(async (data) => {
+        const authSession = auth.onAuthStateChanged(async (data) => {
             console.log(data)
             if(data) {
                 dispatch(setLoading(true));
@@ -38,8 +41,24 @@ function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
                 router.push('/accounts/login');
             }
         })
-        return unsubscribe;
+        return authSession;
     }, [])
+
+    useEffect(() => {
+        if(user) {
+            const socketInitializer = async () => {
+                console.log(user?.uid);
+                await fetch('/api/socket?uid=' + user?.uid);
+                socket = io();
+    
+                socket.on('connect', () => {
+                    console.log('client - connected')
+                })
+
+            }
+            socketInitializer();
+        }
+    }, [user]);
 
     return (
         <div className="w-screen h-screen bg-primary-200 flex flex-col md:flex-row text-primary-100">
