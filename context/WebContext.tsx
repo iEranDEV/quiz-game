@@ -1,14 +1,14 @@
-import React, { createContext, useEffect, useContext } from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { AuthContext } from "./AuthContext";
 
 
 // Declaration of auth context
-export const WebContext = createContext<null>(null)
+export const WebContext = createContext<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
 
 export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
-    let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+    const [socket, setSocket] = useState<any | null>(null);
 
     const authContext = useContext(AuthContext);
     const user = authContext.user;
@@ -16,25 +16,30 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
     useEffect(() => {
         if(user) {
             const socketInitializer = async () => {
-                await fetch('/api/socket?uid=' + user?.uid);
-                socket = io();
-
-                if(socket) {
-                    socket.on('connect', () => {
-                        console.log('client - connected')
-                    })
-    
-                    socket.on('friends-activity', () => {
-                        
-                    })
-                }
+                await fetch('/api/socket');
+                setSocket(io());
             }
             socketInitializer();
         }
     }, [user]);
 
+    useEffect(() => {
+        if(socket && user) {
+            socket.emit('user_connect', user.uid);
+
+            socket.on('connect', () => {
+                console.log('client - connected')
+            })
+
+            socket.on('friends_activity', (arg: Array<string>) => {
+                console.log(arg)
+            })
+        }
+    }, [socket])
+
     return (
-        <WebContext.Provider value={null}>
+        //@ts-ignore
+        <WebContext.Provider value={socket}>
             {children}
         </WebContext.Provider>
     )

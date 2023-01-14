@@ -2,10 +2,12 @@ import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import Layout from "../components/layout/Layout";
+import GameModal from "../components/modal/GameModal";
 import { db } from "../firebase";
 
 export default function Home() {
 	const [categories, setCategories] = useState(Array<Category>());
+	const [gameModal, setGameModal] = useState<Category | null>(null);
 
 	const getAllCategories = async () => {
         const arr = Array<Category>();
@@ -27,7 +29,7 @@ export default function Home() {
 				<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4">
 					{categories.map((category) => {
 						return (
-							<Button key={category.id} bgColor="bg-primary-300/70" shadowColor="shadow-primary-400" width={'w-full'}>
+							<Button onClick={() => setGameModal(category)} key={category.id} bgColor="bg-primary-300/70" shadowColor="shadow-primary-400" width={'w-full'}>
 								<div className="w-full h-full flex flex-col items-center justify-center gap-2 aspect-square py-2">
 									{category.photoURL && <img src={category.photoURL} alt={category.name} className='w-10 aspect-square' />}
 									<p style={{color: category.color}} className='font-bold tracking-widest text-sm'>{category.name}</p>
@@ -36,6 +38,8 @@ export default function Home() {
 						)
 					})}
 				</div>
+
+				{gameModal && <GameModal category={gameModal} setMenu={setGameModal}></GameModal>}
 			</div>
 		</Layout>
 	)
