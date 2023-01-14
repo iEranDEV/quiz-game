@@ -1,26 +1,24 @@
-import { doc, getDoc } from 'firebase/firestore';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { auth, db } from '../../firebase';
-import { RootState } from '../../store/store';
-import { setLoading, setUser } from '../../store/userSlice';
+
+import { useContext, useState } from 'react';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import NavBar from '../NavBar';
 import NotificationElement from '../NotificationElement';
 import io, { Socket } from "socket.io-client";
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { AuthContext } from '../../context/AuthContext';
+import { NotificationContext } from '../../context/NotificationContext';
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function Layout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
 
     const authContext = useContext(AuthContext);
+    const notificationContext = useContext(NotificationContext);
 
     const user = authContext.user;
     const loading = authContext.loading
-    const notifications = useSelector((state: RootState) => state.notifications.notifications);
+    const notifications = notificationContext.notifications;
+    console.log(notifications)
 
     /*useEffect(() => {
         if(user) {

@@ -1,15 +1,14 @@
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { MdOutlineAddCircle, MdPhotoCameraBack } from "react-icons/md";
-import { useDispatch } from "react-redux";
 import { db, storage } from "../../../../firebase";
-import { addNotification } from "../../../../store/notificationsSlice";
 import Button from "../../../Button";
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import Modal from "../../../modal/Modal";
 import { AiOutlineCheck } from "react-icons/ai";
 import SelectList from "../../../SelectList";
+import { NotificationContext } from "../../../../context/NotificationContext";
 
 function EditCategoryModal({ questionObject, setEditModal, editQuestion, categories }: {questionObject: Question, setEditModal: Function, editQuestion: Function, categories: Array<Category>}) {
     const [question, setQuestion] = useState(questionObject.question);
@@ -18,7 +17,7 @@ function EditCategoryModal({ questionObject, setEditModal, editQuestion, categor
     const [correctAnswer, setCorrectAnswer] = useState(questionObject.answers.findIndex(element => element.id === questionObject.correctAnswer));
 
     const mediaRef = useRef(null);
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -57,19 +56,19 @@ function EditCategoryModal({ questionObject, setEditModal, editQuestion, categor
             setEditModal(null);
             editQuestion(questionObj);
             // Add notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
                 message: `Edited question with id ${questionObj.id}!`
-            }))
+            })
         }).catch(() => {
             setEditModal(null);
             // Ad notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'error',
                 message: `An error occured!`
-            }))
+            })
         });
     }
 

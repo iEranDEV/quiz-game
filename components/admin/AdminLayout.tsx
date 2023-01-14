@@ -1,25 +1,24 @@
-import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useContext } from 'react';
-import { useSelector } from 'react-redux';
-import { auth, db } from '../../firebase';
-import { RootState } from '../../store/store';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import AdminNavBar from './AdminNavBar';
 import NotificationElement from '../NotificationElement';
 import { AuthContext } from '../../context/AuthContext';
+import { NotificationContext } from '../../context/NotificationContext';
 
 function AdminLayout({ children }: {children: JSX.Element | Array<JSX.Element>}) {
     const [menu, setMenu] = useState(false);
+
     const authContext = useContext(AuthContext);
+    const notificationContext = useContext(NotificationContext);
     const router = useRouter();
 
     const user = authContext.user;
     const loading = authContext.loading;
-    const notifications = useSelector((state: RootState) => state.notifications.notifications);
+    const notifications = notificationContext.notifications;
 
     useEffect(() => {
-        if(user?.role !== 'ADMIN') {
+        if(user && user.role !== 'ADMIN') {
             router.push('/');
         }
     }, [user])

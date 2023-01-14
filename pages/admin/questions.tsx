@@ -1,16 +1,15 @@
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { MdOutlineAddCircle } from "react-icons/md";
-import { useDispatch } from "react-redux";
 import AdminLayout from "../../components/admin/AdminLayout";
 import DeleteQuestionModal from "../../components/admin/modal/question/DeleteQuestionModal";
 import EditQuestionModal from "../../components/admin/modal/question/EditQuestionModal";
 import NewQuestionModal from "../../components/admin/modal/question/NewQuestionModal";
 import Button from "../../components/Button";
 import SelectList from "../../components/SelectList";
+import { NotificationContext } from "../../context/NotificationContext";
 import { db } from "../../firebase";
-import { addNotification } from "../../store/notificationsSlice";
 
 function AdminQuestionsList() {
     const [questions, setQuestions] = useState(Array<Question>());
@@ -20,7 +19,7 @@ function AdminQuestionsList() {
     const [deleteModal, setDeleteModal] = useState<Question | null>(null);
     const [searchQuery, setSearchQuery] = useState('all');
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const getAllCategories = async () => {
         const arr = Array<Category>();
@@ -50,11 +49,11 @@ function AdminQuestionsList() {
             newQuestions.splice(newQuestions.findIndex((element) => element.id === deleteModal.id), 1)
             setQuestions(newQuestions);
             deleteDoc(doc(db, "questions", deleteModal.id)).then(() => {
-                dispatch(addNotification({
+                notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'info',
                     message: `Deleted question with id ${deleteModal.id}!`
-                }))
+                })
             });
             setDeleteModal(null);
         }

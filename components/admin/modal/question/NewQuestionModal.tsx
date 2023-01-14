@@ -1,15 +1,14 @@
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { MdOutlineAddCircle, MdPhotoCameraBack } from "react-icons/md";
-import { useDispatch } from "react-redux";
 import { db, storage } from "../../../../firebase";
-import { addNotification } from "../../../../store/notificationsSlice";
 import Button from "../../../Button";
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import Modal from "../../../modal/Modal";
 import { AiOutlineCheck } from "react-icons/ai";
 import SelectList from "../../../SelectList";
+import { NotificationContext } from "../../../../context/NotificationContext";
 
 function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {newModal: boolean, setNewModal: Function, addQuestion: Function, categories: Array<Category>}) {
     const [question, setQuestion] = useState('');
@@ -18,7 +17,7 @@ function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {n
     const [correctAnswer, setCorrectAnswer] = useState(0);
 
     const mediaRef = useRef(null);
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -57,19 +56,19 @@ function NewCategoryModal({ newModal, setNewModal, addQuestion, categories }: {n
             setNewModal(false);
             addQuestion(questionObj);
             // Add notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
                 message: `Added new question with id ${questionObj.id}!`
-            }))
+            })
         }).catch(() => {
             setNewModal(false);
             // Ad notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'error',
                 message: `An error occured!`
-            }))
+            })
         });
     }
 

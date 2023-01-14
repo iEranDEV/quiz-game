@@ -1,11 +1,10 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { MdDriveFileRenameOutline, MdOutlineColorLens, MdOutlineUpdate, MdPhotoCameraBack } from "react-icons/md";
 import { TbFileDescription } from "react-icons/tb";
-import { useDispatch } from "react-redux";
+import { NotificationContext } from "../../../../context/NotificationContext";
 import { db, storage } from "../../../../firebase";
-import { addNotification } from "../../../../store/notificationsSlice";
 import Button from "../../../Button";
 import Modal from "../../../modal/Modal";
 
@@ -16,7 +15,7 @@ function EditCategoryModal({ category, setEditModal, editCategory }: {category: 
 
     const colorRef = useRef(null);
     const photoRef = useRef(null);
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -47,11 +46,11 @@ function EditCategoryModal({ category, setEditModal, editCategory }: {category: 
             photoURL: newCategory.photoURL
         }).then(() => {
             editCategory(newCategory);
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
                 message: `Successfully updated category!`
-            }))
+            })
             setEditModal(null);
         })
     }

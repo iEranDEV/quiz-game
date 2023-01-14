@@ -1,11 +1,10 @@
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { MdDriveFileRenameOutline, MdOutlineAddCircle, MdOutlineColorLens, MdPhotoCameraBack } from "react-icons/md";
 import { TbFileDescription } from "react-icons/tb";
-import { useDispatch } from "react-redux";
+import { NotificationContext } from "../../../../context/NotificationContext";
 import { db, storage } from "../../../../firebase";
-import { addNotification } from "../../../../store/notificationsSlice";
 import Button from "../../../Button";
 import Modal from "../../../modal/Modal";
 
@@ -16,7 +15,7 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
 
     const colorRef = useRef(null);
     const photoRef = useRef(null);
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -45,19 +44,19 @@ function NewCategoryModal({ newModal, setNewModal, addCategory }: {newModal: boo
             setNewModal(false);
             addCategory(category);
             // Add notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
                 message: `Added new category with id ${category.id}!`
-            }))
+            })
         }).catch((error) => {
             setNewModal(false);
             // Ad notification
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'error',
                 message: `An error occured!`
-            }))
+            })
         });
     }
 

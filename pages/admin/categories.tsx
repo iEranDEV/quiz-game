@@ -1,15 +1,14 @@
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { MdOutlineAddCircle } from "react-icons/md";
-import { useDispatch } from "react-redux";
 import AdminLayout from "../../components/admin/AdminLayout";
 import DeleteCategoryModal from "../../components/admin/modal/category/DeleteCategoryModal";
 import EditCategoryModal from "../../components/admin/modal/category/EditCategoryModal";
 import NewCategoryModal from "../../components/admin/modal/category/NewCategoryModal";
 import Button from "../../components/Button";
+import { NotificationContext } from "../../context/NotificationContext";
 import { db } from "../../firebase";
-import { addNotification } from "../../store/notificationsSlice";
 
 function AdminCategoriesList() {
     const [categories, setCategories] = useState(Array<Category>());
@@ -17,7 +16,7 @@ function AdminCategoriesList() {
     const [editModal, setEditModal] = useState<Category | null>(null);
     const [deleteModal, setDeleteModal] = useState<Category | null>(null);
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
 
     const getAllCategories = async () => {
         const arr = Array<Category>();
@@ -38,11 +37,11 @@ function AdminCategoriesList() {
             newCategories.splice(newCategories.findIndex((element) => element.id === deleteModal.id), 1)
             setCategories(newCategories);
             deleteDoc(doc(db, "categories", deleteModal.id)).then(() => {
-                dispatch(addNotification({
+                notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'info',
                     message: `Deleted category with id ${deleteModal.id}!`
-                }))
+                })
             });
             setDeleteModal(null);
         }

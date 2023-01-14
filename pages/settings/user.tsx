@@ -4,14 +4,12 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useRef, useState, useContext } from "react";
 import { BiUser, BiImage, BiTrash } from "react-icons/bi";
 import { MdLibraryAddCheck } from "react-icons/md";
-import { useDispatch } from "react-redux";
 import Button from "../../components/Button";
 import Layout from "../../components/layout/Layout";
 import SettingsLayout from "../../components/layout/SettingsLayout";
 import { AuthContext } from "../../context/AuthContext";
+import { NotificationContext } from "../../context/NotificationContext";
 import { db, storage } from "../../firebase";
-import { addNotification } from "../../store/notificationsSlice";
-import { setUser } from "../../store/userSlice";
 
 
 function UserSettings() {
@@ -19,7 +17,7 @@ function UserSettings() {
     const [file, setFile] = useState<File | null>(null);
     const [photo, setPhoto] = useState<null | string>();
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
     const authContext = useContext(AuthContext);
     const user = authContext.user;
     const router = useRouter();
@@ -65,11 +63,11 @@ function UserSettings() {
             newUser.photoURL = (url != null ? url : photo);
             authContext.setUser(newUser);
             router.push('/')
-            dispatch(addNotification({
+            notificationContext.addNotification({
                 id: crypto.randomUUID(),
                 type: 'success',
                 message: 'User profile updated successfully!'
-            }))
+            })
         }).catch((error) => {
             console.log('error');
         })

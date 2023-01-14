@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { useDispatch } from "react-redux";
-import { removeNotification } from "../store/notificationsSlice";
+import { NotificationContext } from "../context/NotificationContext";
 
 
 function Notification({ id, type, message }: INotification) {
 
-    const dispatch = useDispatch();
+    const notificationContext = useContext(NotificationContext);
+
     useEffect(() => {
         setTimeout(() => {
-            dispatch(removeNotification(id))
+            const newVal = [...notificationContext.notifications];
+            newVal.splice(newVal.findIndex((element) => element.id === id), 1);
+            notificationContext.setNofifications(newVal);
         }, 3000)
     }, [])
 
