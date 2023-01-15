@@ -39,4 +39,21 @@ declare global {
         content: string,
     }
 
+    type Game = {
+        id: string,
+        host: string,
+        player: string | null,
+        questions: Array<Question>,
+        mode: 'solo' | 'vs',
+        loading: boolean,
+        category: string,
+    }
+
+    type GameRequest = {
+        id: string,
+        from: string,
+        to: string,
+        category: string,
+    }
+
 }

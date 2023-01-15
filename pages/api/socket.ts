@@ -9,25 +9,42 @@ const SocketHandler = (req: any, res: any) => {
 
         io.on('connection', (socket) => {
 
+            // User disconnect event
             socket.on('disconnect', () => {
-                // Handle disconnect
                 const id = [...Array.from(users.entries())].find((item) => item[1] === socket.id);
                 if(id) {
                     users.delete(id[0]);
                 }
             })
 
+            // Initialize user connection to storage
             socket.on('user_connect', (id: string) => {
                 users.set(id, socket.id);
                 console.log(`Initialized connection with user (${id}), id: ${socket.id}`);
             })
 
+            // Get friends activity
             socket.on('get_friends_activity', (friends: Array<string>, callback) => {
                 const arr = Array<string>();
                 friends.forEach((item) => {
                     if(users.has(item)) arr.push(item);
                 })
                 callback(arr);
+            })
+
+            // User sent game request to server (sent it to player)
+            socket.on('game_request', (game: Game) => {
+                if(users.get(game.player as string)) {
+                    socket.to(users.get(game.player as string) as string).emit('game_request', game);
+                }
+            })
+
+            // User accepted request
+            socket.on('accept_request', (game: Game) => {
+                if(users.get(game.host) && users.get(game.player as string)) {
+                    socket.to(users.get(game.host) as string).emit('start_game', game);
+                    socket.to(users.get(game.player as string) as string).emit('start_game', game);
+                }
             })
         })
     }

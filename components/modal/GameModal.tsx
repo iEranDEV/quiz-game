@@ -6,9 +6,11 @@ import { FiUser, FiUsers } from 'react-icons/fi';
 import { FaRegSadTear } from "react-icons/fa";
 import { WebContext } from "../../context/WebContext";
 import { AuthContext } from "../../context/AuthContext";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { BsCheckLg } from "react-icons/bs";
+import { GameContext } from "../../context/GameContext";
+import { useRouter } from "next/router";
 
 function GameModal({ category, setMenu }: {category: Category, setMenu: Function}) {
     const [mode, setMode] = useState<'solo' | 'vs'>('solo');
@@ -16,8 +18,10 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
     const [onlineFriends, setOnlineFriends] = useState(Array<User>());
     const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
 
+    const router = useRouter();
     const webContext = useContext(WebContext);
     const authContext = useContext(AuthContext);
+    const gameContext = useContext(GameContext);
     const user = authContext.user;
 
     useEffect(() => {
@@ -43,11 +47,49 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
         }
     }, [onlineFriendsIDS])
 
-    const handleClick = () => {
+    const getRandomQuestions = async (categoryID: string) => {
+        const arr = Array<Question>();
+        const q = query(collection(db, 'questions'), where('category', '==', categoryID));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((item) => {
+            arr.push(item.data() as Question);
+        })
+        const questions = Array<Question>();
+        for(let i = 0; i < 6; i++) {
+            questions.push(arr[Math.floor(Math.random() * arr.length)]);
+        }
+        return questions;
+    }
+
+    const handleClick = async () => {
         if(mode === 'vs' && selectedFriend) {
             // Vs mode (selected friend)
+            const questions = await getRandomQuestions(category.id);
+            const game = {
+                id: crypto.randomUUID(),
+                host: user?.uid,
+                player: selectedFriend.uid,
+                questions: questions,
+                mode: 'vs',
+                loading: true,
+                category: category.id,
+            } as Game
+            gameContext?.setGame(game);
+            webContext?.emit('game_request', game);
+            router.push('/game');
         }  else if (mode == 'solo') {
             // Solo mode
+            const questions = await getRandomQuestions(category.id);
+            gameContext?.setGame({
+                id: crypto.randomUUID(),
+                host: user?.uid,
+                player: null,
+                questions: questions,
+                mode: 'solo',
+                loading: false,
+                category: category.id,
+            } as Game);
+            router.push('/game');
         }
     }
 

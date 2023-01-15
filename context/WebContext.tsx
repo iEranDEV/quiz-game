@@ -1,7 +1,10 @@
+import { useRouter } from "next/router";
 import React, { createContext, useEffect, useContext, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { AuthContext } from "./AuthContext";
+import { GameContext } from "./GameContext";
+import { NotificationContext } from "./NotificationContext";
 
 
 // Declaration of auth context
@@ -11,7 +14,11 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
     const [socket, setSocket] = useState<any | null>(null);
 
     const authContext = useContext(AuthContext);
+    const gameContext = useContext(GameContext);
+    const notificationContext = useContext(NotificationContext);
     const user = authContext.user;
+
+    const router = useRouter();
 
     useEffect(() => {
         if(user) {
@@ -30,6 +37,15 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             socket.on('connect', () => {
                 console.log('client - connected')
             })
+
+            socket.on('game_request', (game: Game) => {
+                gameContext?.setRequests([...gameContext.requests, game]);
+            })
+
+            socket.on('start_game', (game: Game) => {
+                console.log(game);
+            })
+    
         }
     }, [socket])
 
