@@ -22,14 +22,12 @@ const SocketHandler = (req: any, res: any) => {
                 console.log(`Initialized connection with user (${id}), id: ${socket.id}`);
             })
 
-            socket.on('get_friends_activity', (friends: Array<string>) => {
-                console.log('test')
+            socket.on('get_friends_activity', (friends: Array<string>, callback) => {
                 const arr = Array<string>();
                 friends.forEach((item) => {
                     if(users.has(item)) arr.push(item);
                 })
-                console.log(arr);
-                socket.emit('friends_activity', arr);
+                callback(arr);
             })
         })
     }

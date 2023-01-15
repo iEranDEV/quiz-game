@@ -3,14 +3,23 @@ import { useEffect, useState, useContext } from "react";
 import { TbMoodCry, TbUserExclamation, TbUserPlus, TbUserX } from "react-icons/tb";
 import { AuthContext } from "../../context/AuthContext";
 import { NotificationContext } from "../../context/NotificationContext";
+import { WebContext } from "../../context/WebContext";
 import { db } from "../../firebase";
 
 function FriendsList({ searchQuery }: { searchQuery: string | null }) {
     const [results, setResults] = useState(Array<User>());
+    const [onlineFriends, setOnlineFriends] = useState(Array<string>());
 
     const notificationContext = useContext(NotificationContext);
     const authContext = useContext(AuthContext);
+    const webContext = useContext(WebContext);
     const user = authContext.user;
+
+    useEffect(() => {
+        webContext?.emit('get_friends_activity', user?.friends, (response: any) => {
+            setOnlineFriends(response);
+        });
+    }, []);
 
     const syncData = async () => {
         if(user) {
@@ -114,9 +123,10 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                     {results.map((result) => {
                         return (
                             <div key={result.uid} className="flex justify-between items-center py-2">
-                                <div className="flex gap-4 w-full items-center">
+                                <div className="flex gap-4 w-full items-center relative">
                                     <img src={result.photoURL as string} alt={result.username} className='rounded-full h-7 w-7' />
                                     <p>{result.username}</p>
+                                    {onlineFriends.includes(result.uid) && <div className="w-3 h-3 bg-green-500 rounded-full absolute -top-1 -left-1 border-2 border-primary-200"></div>}
                                 </div>
                                 {renderIcon(result)}
                             </div>

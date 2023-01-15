@@ -30,10 +30,6 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             socket.on('connect', () => {
                 console.log('client - connected')
             })
-
-            socket.on('friends_activity', (arg: Array<string>) => {
-                console.log(arg)
-            })
         }
     }, [socket])
 
