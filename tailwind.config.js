@@ -21,10 +21,15 @@ module.exports = {
 				slideIn: {
 					'0%': { transform: 'translateX(-2.5rem)' },
 					'100%': { transform: 'translateX(0px)' }
+				},
+				progress: {
+					'0%': { width: '100%' },
+					'100%': { width: '0%' },
 				}
 			},
 			animation: {
-				'slideIn': 'slideIn 0.3s forwards ease-in-out'
+				'slideIn': 'slideIn 0.3s forwards ease-in-out',
+				'progress': 'progress 7s forwards linear'
 			}
 		},
 	},

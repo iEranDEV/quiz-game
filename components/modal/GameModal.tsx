@@ -73,6 +73,7 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
                 mode: 'vs',
                 loading: true,
                 category: category.id,
+                answers: {host: Array<string>(), player: Array<string>()},
             } as Game
             gameContext?.setGame(game);
             webContext?.emit('game_request', game);
@@ -88,6 +89,7 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
                 mode: 'solo',
                 loading: false,
                 category: category.id,
+                answers: {host: Array<string>(), player: Array<string>()},
             } as Game);
             router.push('/game');
         }

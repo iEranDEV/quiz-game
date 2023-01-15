@@ -46,13 +46,7 @@ declare global {
         questions: Array<Question>,
         mode: 'solo' | 'vs',
         loading: boolean,
-        category: string,
-    }
-
-    type GameRequest = {
-        id: string,
-        from: string,
-        to: string,
+        answers: {host: Array<string>, player: Array<string>},
         category: string,
     }
 
