@@ -56,9 +56,10 @@ export default function Home() {
 	}, [gameContext?.requests])
 
 	const acceptRequest = async (request: {user: User, category: Category, game: Game}) => {
-		gameContext?.setGame(request.game);
-		router.push('/game');
-		webContext?.emit('accept_request', request.game);
+		webContext?.emit('accept_request', request.game, (response: Game) => {
+			router.push('/game');
+			gameContext?.setGame(response);
+		});
 	}
 
 	const declineRequest = async (request: {user: User, category: Category, game: Game}) => {

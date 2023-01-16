@@ -36,16 +36,23 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
 
             socket.on('connect', () => {
                 console.log('client - connected')
-            })
+            });
 
             socket.on('game_request', (game: Game) => {
                 gameContext?.setRequests([...gameContext.requests, game]);
-            })
+            });
 
             socket.on('start_game', (game: Game) => {
-                console.log(game);
+                const newGame = JSON.parse(JSON.stringify(game)) as Game;
+                newGame.loading = false;
+                gameContext?.setGame(newGame);
+                gameContext?.setPlayerPoints([]);
+            });
+
+            socket.on('game_update', (game: Game) => {
+                gameContext?.setPlayerPoints(game.answers.host);
             })
-    
+
         }
     }, [socket])
 

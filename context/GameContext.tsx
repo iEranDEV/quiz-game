@@ -7,12 +7,15 @@ export const GameContext = createContext<{
     game: Game | null,
     setGame: Function, 
     requests: Array<Game>, 
-    setRequests: Function
+    setRequests: Function,
+    playerPoints: Array<string>,
+    setPlayerPoints: Function
 } | null>(null)
 
 export const GameContextProvider = ({ children }: {children: JSX.Element}) => {
     const [game, setGame] = useState<Game | null>(null);
     const [requests, setRequests] = useState(Array<Game>())
+    const [playerPoints, setPlayerPoints] = useState(Array<string>());
 
     const router = useRouter();
 
@@ -20,7 +23,9 @@ export const GameContextProvider = ({ children }: {children: JSX.Element}) => {
     const user = authContext.user;
 
     return (
-        <GameContext.Provider value={{game: game, setGame: setGame, requests: requests, setRequests: setRequests}}>
+        <GameContext.Provider value={{game: game, setGame: setGame, 
+                                    requests: requests, setRequests: setRequests, 
+                                    playerPoints: playerPoints, setPlayerPoints: setPlayerPoints}}>
             {children}
         </GameContext.Provider>
     )

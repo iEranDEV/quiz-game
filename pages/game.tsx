@@ -1,3 +1,4 @@
+import { doc, getDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsCircleFill } from "react-icons/bs";
@@ -7,6 +8,7 @@ import Layout from "../components/layout/Layout";
 import { AuthContext } from "../context/AuthContext";
 import { GameContext } from "../context/GameContext";
 import { WebContext } from "../context/WebContext";
+import { db } from "../firebase";
 
 function GamePage() {
 
@@ -19,6 +21,7 @@ function GamePage() {
     const [questions, setQuestions] = useState(JSON.parse(JSON.stringify(game?.questions)) as Array<Question>);
     const [mode, setMode] = useState<'quiz' | 'results'>('quiz');
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [opponent, setOpponent] = useState<User | null>();
 
     const nextQuestion = () => {
         const newQuestions = JSON.parse(JSON.stringify(questions)) as Array<Question>;
@@ -28,15 +31,30 @@ function GamePage() {
     }
 
     useEffect(() => {
+        if(game?.player) {
+            const syncOpponent = async () => {
+                const docSnap = await getDoc(doc(db, "users", game.player as string));
+                if(docSnap.exists()) {
+                    setOpponent(docSnap.data() as User);
+                }
+            }
+            syncOpponent();
+        }
+    }, [game?.player]);
+
+    useEffect(() => {
         if(mode === 'results') {
             const newGame = JSON.parse(JSON.stringify(game)) as Game;
             if(selectedAnswer)  newGame.answers.host.push(selectedAnswer);
             else newGame.answers.host.push('');
+            webContext?.emit('game_update', newGame);
             gameContext?.setGame(newGame);
             setTimeout(() => {
-                nextQuestion();
-                setSelectedAnswer(null);
-                setMode('quiz');
+                if(questions.length > 0) {
+                    nextQuestion();
+                    setSelectedAnswer(null);
+                    setMode('quiz');
+                }
             }, 3000)
         }
     }, [mode])
@@ -78,6 +96,17 @@ function GamePage() {
                                 </div>
                 
                                 {/* Other player data */}
+                                <div className="flex gap-4 items-end">
+                                    <div className="flex flex-col justify-between items-end h-10">
+                                        <p>{opponent?.username}</p>
+                                        <div className="flex gap-2">
+                                            {Array.from(Array(6), (e, i) => {
+                                                return <BsCircleFill key={i} className={`h-2 w-2 ${getAnswerData(i, gameContext.playerPoints)}`}></BsCircleFill>
+                                            })}
+                                        </div>
+                                    </div>
+                                    {opponent?.photoURL && <img src={opponent.photoURL} className='w-10 h-10 rounded-full' />}
+                                </div>
                             </div>
                             <div className="w-full flex justify-center items-center text-lg h-60">
                                 {questions[0].question}

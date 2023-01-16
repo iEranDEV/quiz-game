@@ -40,10 +40,22 @@ const SocketHandler = (req: any, res: any) => {
             })
 
             // User accepted request
-            socket.on('accept_request', (game: Game) => {
+            socket.on('accept_request', (game: Game, callback) => {
                 if(users.get(game.host) && users.get(game.player as string)) {
-                    socket.to(users.get(game.host) as string).emit('start_game', game);
-                    socket.to(users.get(game.player as string) as string).emit('start_game', game);
+                    socket.to(users.get({...game}.host) as string).emit('start_game', game);
+                    const newGame = JSON.parse(JSON.stringify(game)) as Game;
+                    const host = game.host;
+                    newGame.host = game.player as string;
+                    newGame.player = host;
+                    newGame.loading = false;
+                    callback(newGame);
+                }
+            })
+
+            // Game update
+            socket.on('game_update', (game: Game) => {
+                if(users.get(game.player as string)) {
+                    socket.to(users.get((game.player as string)) as string).emit('game_update', game);
                 }
             })
         })

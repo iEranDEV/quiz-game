@@ -38,20 +38,6 @@ function SettingsLayout({ children }: {children: JSX.Element}) {
                     <TbLockSquare className='w-5 h-5 text-orange-300'></TbLockSquare>
                     <p>Change password</p>
                 </Link>
-
-                <Link href="/" className={`settingsLink`} onClick={() => setMenu(false)}>
-                    <TbDiamond className='w-5 h-5 text-orange-300'></TbDiamond>
-                    <p>Quizly premium</p>
-                </Link>
-                <Link href="/" className={`settingsLink`} onClick={() => setMenu(false)}>
-                    <TbShieldCheck className='w-5 h-5 text-orange-300'></TbShieldCheck>
-                    <p>Privacy policy</p>
-                </Link>
-
-                <Link href="/" className={`settingsLink`} onClick={() => setMenu(false)}>
-                    <TbQuestionMark className='w-5 h-5 text-orange-300'></TbQuestionMark>
-                    <p>Ask question</p>
-                </Link>
                 <div className="settingsLink text-red-300" onClick={() => handleLogOut()}>
                     <TbLogout className="w-5 h-5 text-red-400"></TbLogout>
                     <p>Log out</p>
