@@ -50,4 +50,11 @@ declare global {
         category: string,
     }
 
+    type GameResult = {
+        id: string,
+        category: string,
+        player: string | null,
+        result: string,
+    }
+
 }

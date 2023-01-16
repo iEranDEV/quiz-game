@@ -1,4 +1,5 @@
 import { doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsCircleFill } from "react-icons/bs";
@@ -18,11 +19,19 @@ function GamePage() {
     const webContext = useContext(WebContext);
     const gameContext = useContext(GameContext);
     const game = gameContext?.game;
+    const router = useRouter();
 
-    const [questions, setQuestions] = useState(JSON.parse(JSON.stringify(game?.questions)) as Array<Question>);
+    const [questions, setQuestions] = useState<Array<Question> | null>(null);
     const [mode, setMode] = useState<'quiz' | 'results'>('quiz');
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [opponent, setOpponent] = useState<User | null>();
+
+    useEffect(() => {
+        if(!game) router.push('/');
+        else {
+            setQuestions(JSON.parse(JSON.stringify(game?.questions)) as Array<Question>);
+        }
+    }, []);
 
     const nextQuestion = () => {
         const newQuestions = JSON.parse(JSON.stringify(questions)) as Array<Question>;
@@ -42,6 +51,7 @@ function GamePage() {
             syncOpponent();
         }
     }, [game?.player]);
+
     useEffect(() => {
         if(mode === 'results') {
             const newGame = JSON.parse(JSON.stringify(game)) as Game;
@@ -50,12 +60,10 @@ function GamePage() {
             webContext?.emit('game_update', newGame);
             gameContext?.setGame(newGame);
             setTimeout(() => {
-                if(questions.length > 0) {
+                if(questions && questions.length > 0) {
                     nextQuestion();
                     setSelectedAnswer(null);
                     setMode('quiz');
-                } else {
-                    gameContext?.setGame(null);
                 }
             }, 3000)
         }
@@ -80,7 +88,7 @@ function GamePage() {
                 </div>)
             :   
                 <>
-                    {questions.length > 0 && game ? 
+                    {questions &&questions.length > 0 && game ? 
                         <div className="w-full h-full flex flex-col gap-2 py-4">
                             <Countdown questions={questions} setQuestions={setQuestions} mode={mode} setMode={setMode}></Countdown>
                             <div className="w-full flex justify-between items-center">

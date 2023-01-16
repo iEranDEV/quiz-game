@@ -1,4 +1,5 @@
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import Link from "next/link";
 import { useEffect, useState, useContext } from "react";
 import { TbMoodCry, TbUserExclamation, TbUserPlus, TbUserX } from "react-icons/tb";
 import { AuthContext } from "../../context/AuthContext";
@@ -122,14 +123,16 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                 <div className="w-full md:w-96 flex flex-col gap-2 divide-y divide-primary-100">
                     {results.map((result) => {
                         return (
-                            <div key={result.uid} className="flex justify-between items-center py-2">
-                                <div className="flex gap-4 w-full items-center relative">
-                                    <img src={result.photoURL as string} alt={result.username} className='rounded-full h-7 w-7' />
-                                    <p>{result.username}</p>
-                                    {onlineFriends.includes(result.uid) && <div className="w-3 h-3 bg-green-500 rounded-full absolute -top-1 -left-1 border-2 border-primary-200"></div>}
+                            <Link key={result.uid} href={'/profile/' + result.uid}>
+                                <div className="flex justify-between items-center py-2">
+                                    <div className="flex gap-4 w-full items-center relative">
+                                        <img src={result.photoURL as string} alt={result.username} className='rounded-full h-7 w-7' />
+                                        <p>{result.username}</p>
+                                        {onlineFriends.includes(result.uid) && <div className="w-3 h-3 bg-green-500 rounded-full absolute -top-1 -left-1 border-2 border-primary-200"></div>}
+                                    </div>
+                                    {renderIcon(result)}
                                 </div>
-                                {renderIcon(result)}
-                            </div>
+                            </Link>
                         )
                     })}
                 </div>

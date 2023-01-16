@@ -1,9 +1,14 @@
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { db } from "../../firebase";
 import Button from "../Button";
 
 function EndGameScreen({ game }: {game: Game}) {
     const [data, setData] = useState<Game>(JSON.parse(JSON.stringify(game)));
+
+    const authContext = useContext(AuthContext);
 
     const getPoints = (game: Game) => {
         const hostPoints = {
@@ -32,6 +37,21 @@ function EndGameScreen({ game }: {game: Game}) {
     }
 
     const [points, setPoints] = useState(getPoints(data));
+
+    useEffect(() => {
+        const saveGame = async () => {
+            const docSnap = await getDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id));
+            if(!docSnap.exists()) {
+                await setDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id), {
+                    id: data.id,
+                    category: data.category,
+                    player: data.player,
+                    result: points.host.count > points.player.count ? ('win') : (points.host.count < points.player.count ? ('lose') : ('draw')),
+                })
+            }
+        }
+        saveGame();
+    }, [])
 
     return (
         <>

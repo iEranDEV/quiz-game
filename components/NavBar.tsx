@@ -40,10 +40,12 @@ function NavBar({ menu, setMenu }: {menu: boolean, setMenu: Function}) {
                             {friendsNotification && <p className="bg-primary-200 text-stone-50 rounded-full p-1 text-xs">{user?.friendRequests.length}</p>}
                         </div>
                     </Link>
-                    <div className='navLink'>
-                        <TbUser className='w-5 h-5 text-orange-300'></TbUser>
-                        <p>Profile</p>
-                    </div>
+                    <Link href={"/profile/" + user?.uid} className='w-full'>
+                        <div className={`navLink ${router.pathname.includes('/profile') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
+                            <TbUser className='w-5 h-5 text-orange-300'></TbUser>
+                            <p>Profile</p>
+                        </div>
+                    </Link>
                     <Link href="/settings/user" className='w-full'>
                         <div className={`navLink ${router.pathname.includes('/settings') && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
                             <TbSettings className='w-5 h-5 text-orange-300'></TbSettings>

@@ -60,6 +60,9 @@ export default function Home() {
 			router.push('/game');
 			gameContext?.setGame(response);
 		});
+		const newRequests = JSON.parse(JSON.stringify(gameContext?.requests)) as Array<Game>;
+		newRequests.splice(newRequests.findIndex((item) => item.id == request.game.id), 1);
+		gameContext?.setRequests(newRequests);
 	}
 
 	const declineRequest = async (request: {user: User, category: Category, game: Game}) => {
