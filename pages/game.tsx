@@ -4,6 +4,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsCircleFill } from "react-icons/bs";
 import Button from "../components/Button";
 import Countdown from "../components/game/Countdown";
+import EndGameScreen from "../components/game/EndGameScreen";
 import Layout from "../components/layout/Layout";
 import { AuthContext } from "../context/AuthContext";
 import { GameContext } from "../context/GameContext";
@@ -41,7 +42,6 @@ function GamePage() {
             syncOpponent();
         }
     }, [game?.player]);
-
     useEffect(() => {
         if(mode === 'results') {
             const newGame = JSON.parse(JSON.stringify(game)) as Game;
@@ -54,6 +54,8 @@ function GamePage() {
                     nextQuestion();
                     setSelectedAnswer(null);
                     setMode('quiz');
+                } else {
+                    gameContext?.setGame(null);
                 }
             }, 3000)
         }
@@ -96,7 +98,7 @@ function GamePage() {
                                 </div>
                 
                                 {/* Other player data */}
-                                <div className="flex gap-4 items-end">
+                                {game.player && <div className="flex gap-4 items-end">
                                     <div className="flex flex-col justify-between items-end h-10">
                                         <p>{opponent?.username}</p>
                                         <div className="flex gap-2">
@@ -106,7 +108,7 @@ function GamePage() {
                                         </div>
                                     </div>
                                     {opponent?.photoURL && <img src={opponent.photoURL} className='w-10 h-10 rounded-full' />}
-                                </div>
+                                </div>}
                             </div>
                             <div className="w-full flex justify-center items-center text-lg h-60">
                                 {questions[0].question}
@@ -130,7 +132,7 @@ function GamePage() {
                             </div>
                         </div>
                     :
-                        <div>test</div>
+                        <EndGameScreen game={JSON.parse(JSON.stringify(game)) as Game}></EndGameScreen>
                     }
                 </>
             }

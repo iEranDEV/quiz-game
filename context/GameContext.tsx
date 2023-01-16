@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 
@@ -18,6 +18,14 @@ export const GameContextProvider = ({ children }: {children: JSX.Element}) => {
     const [playerPoints, setPlayerPoints] = useState(Array<string>());
 
     const router = useRouter();
+
+    useEffect(() => {
+        if(game) {
+            const newGame = JSON.parse(JSON.stringify(game)) as Game;
+            newGame.answers.player = [...playerPoints];
+            setGame(newGame);
+        }
+    }, [playerPoints]);
 
     const authContext = useContext(AuthContext);
     const user = authContext.user;
