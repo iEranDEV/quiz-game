@@ -1,3 +1,4 @@
+import axios from "axios";
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import Link from "next/link";
 import { useEffect, useState, useContext } from "react";
@@ -17,10 +18,15 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
     const user = authContext.user;
 
     useEffect(() => {
-        webContext?.emit('get_friends_activity', user?.friends, (response: any) => {
-            setOnlineFriends(response);
-        });
-    }, []);
+        if(user) {
+            const getFriends = async () => {
+                console.log(user?.friends)
+                const response = await axios.post('/api/socket', { type: 'get_friends', arr: user?.friends} );
+                setOnlineFriends(response.data);
+            }
+            getFriends();
+        }
+    }, [user]);
 
     const syncData = async () => {
         if(user) {

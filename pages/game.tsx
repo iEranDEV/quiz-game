@@ -1,3 +1,4 @@
+import axios from "axios";
 import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
@@ -53,19 +54,26 @@ function GamePage() {
     }, [game?.player]);
 
     useEffect(() => {
-        if(mode === 'results') {
-            const newGame = JSON.parse(JSON.stringify(game)) as Game;
-            if(selectedAnswer)  newGame.answers.host.push(selectedAnswer);
-            else newGame.answers.host.push('');
-            webContext?.emit('game_update', newGame);
-            gameContext?.setGame(newGame);
-            setTimeout(() => {
-                if(questions && questions.length > 0) {
-                    nextQuestion();
-                    setSelectedAnswer(null);
-                    setMode('quiz');
+        if(game?.loading === false) {
+            if(mode === 'results') {
+                const newGame = JSON.parse(JSON.stringify(game)) as Game;
+                if(selectedAnswer)  newGame.answers.host.push(selectedAnswer);
+                else newGame.answers.host.push('');
+                if(game.mode === 'vs') {
+                    const sendUpdate = async () => {
+                        await axios.post('/api/socket', {type: 'update', data: newGame});
+                    }
+                    sendUpdate();
                 }
-            }, 3000)
+                gameContext?.setGame(newGame);
+                setTimeout(() => {
+                    if(questions && questions.length > 0) {
+                        nextQuestion();
+                        setSelectedAnswer(null);
+                        setMode('quiz');
+                    }
+                }, 3000)
+            }
         }
     }, [mode])
 
@@ -81,6 +89,8 @@ function GamePage() {
 
     return (
         <Layout>
+            <>
+            {game?.id}
             {game?.loading ? 
                 (<div className='w-full h-full flex flex-col gap-4 justify-center items-center'>
                     <AiOutlineLoading3Quarters className='w-10 h-10 text-primary-100 animate-spin'></AiOutlineLoading3Quarters>
@@ -144,6 +154,7 @@ function GamePage() {
                     }
                 </>
             }
+            </>
         </Layout>
     )
 }

@@ -10,6 +10,7 @@ import { db } from "../firebase";
 import { IoGameControllerOutline } from 'react-icons/io5';
 import { TbCheck, TbX } from "react-icons/tb";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 export default function Home() {
 	const [categories, setCategories] = useState(Array<Category>());
@@ -56,10 +57,11 @@ export default function Home() {
 	}, [gameContext?.requests])
 
 	const acceptRequest = async (request: {user: User, category: Category, game: Game}) => {
-		webContext?.emit('accept_request', request.game, (response: Game) => {
+		const response = await axios.post('/api/socket', {type: 'accept_request', id: authContext.user?.uid,data: request.game});
+		if(response) {
+			gameContext?.setGame(response.data.game as Game);
 			router.push('/game');
-			gameContext?.setGame(response);
-		});
+		}
 		const newRequests = JSON.parse(JSON.stringify(gameContext?.requests)) as Array<Game>;
 		newRequests.splice(newRequests.findIndex((item) => item.id == request.game.id), 1);
 		gameContext?.setRequests(newRequests);

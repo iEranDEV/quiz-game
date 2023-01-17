@@ -1,64 +1,84 @@
-import { useRouter } from "next/router";
+import Pusher, { Channel } from "pusher-js";
 import React, { createContext, useEffect, useContext, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { AuthContext } from "./AuthContext";
 import { GameContext } from "./GameContext";
-import { NotificationContext } from "./NotificationContext";
+import axios from 'axios';
 
 
 // Declaration of auth context
-export const WebContext = createContext<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
+export const WebContext = createContext<{instance: Pusher | null, channel: Channel | undefined}>({
+    instance: null,
+    channel: undefined,
+});
 
 export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
-    const [socket, setSocket] = useState<any | null>(null);
+    const [instance, setInstance] = useState<Pusher | null>(null);
+    const [channel, setChannel] = useState<Channel | undefined>(undefined);
+    const [userChannel, setUserChannel] = useState<Channel | undefined>(undefined);
 
     const authContext = useContext(AuthContext);
     const gameContext = useContext(GameContext);
-    const notificationContext = useContext(NotificationContext);
     const user = authContext.user;
-
-    const router = useRouter();
+    const game = gameContext?.game;
 
     useEffect(() => {
         if(user) {
-            const socketInitializer = async () => {
-                await fetch('/api/socket');
-                setSocket(io());
+            const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, { cluster: 'eu' })
+            setInstance(pusher);
+            const userChannel = pusher.subscribe(user.uid);
+
+            userChannel.bind("send_request", (data: any) => {
+                gameContext?.setRequests([...gameContext.requests, data.data]);
+            })
+
+            setUserChannel(userChannel);
+            
+
+
+            const connect = async () => {
+                await axios.post('/api/socket', { type: 'connect', id: user.uid});
             }
-            socketInitializer();
+            connect();
+        }
+
+        return () => {
+            if(instance) {
+                instance.unsubscribe(user?.uid as string);
+                instance.disconnect();
+            }
         }
     }, [user]);
 
     useEffect(() => {
-        if(socket && user) {
-            socket.emit('user_connect', user.uid);
+        if(game && user && game.mode === 'vs') {
+            const channel = instance?.subscribe(game.id);
+            setChannel(channel);
 
-            socket.on('connect', () => {
-                console.log('client - connected')
-            });
-
-            socket.on('game_request', (game: Game) => {
-                gameContext?.setRequests([...gameContext.requests, game]);
-            });
-
-            socket.on('start_game', (game: Game) => {
-                const newGame = JSON.parse(JSON.stringify(game)) as Game;
-                newGame.loading = false;
-                gameContext?.setGame(newGame);
-                gameContext?.setPlayerPoints([]);
-            });
-
-            socket.on('game_update', (game: Game) => {
-                gameContext?.setPlayerPoints(game.answers.host);
+            userChannel?.bind("start_game", (id: {id: string}) => {
+                const startGame = (id: {id: string}) => {
+                    if(game?.id === id.id) {
+                        const newGame = JSON.parse(JSON.stringify(game)) as Game;
+                        newGame.loading = false;
+                        gameContext?.setGame(newGame);
+                    }
+                }
+                startGame(id);
             })
 
+            userChannel?.bind('update', (data: {playerPoints: Array<string>}) => {
+                gameContext.setPlayerPoints(data.playerPoints);
+            })
+
+            return () => {
+                instance?.unsubscribe(game.id);
+                setChannel(undefined);
+            }
         }
-    }, [socket])
+    }, [game]);
 
     return (
         //@ts-ignore
-        <WebContext.Provider value={socket}>
+        <WebContext.Provider value={{instance: instance, channel: channel}}>
             {children}
         </WebContext.Provider>
     )

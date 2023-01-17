@@ -40,14 +40,16 @@ function EndGameScreen({ game }: {game: Game}) {
 
     useEffect(() => {
         const saveGame = async () => {
-            const docSnap = await getDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id));
-            if(!docSnap.exists()) {
-                await setDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id), {
-                    id: data.id,
-                    category: data.category,
-                    player: data.player,
-                    result: points.host.count > points.player.count ? ('win') : (points.host.count < points.player.count ? ('lose') : ('draw')),
-                })
+            if(game.answers.host.length === 6) {
+                const docSnap = await getDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id));
+                if(!docSnap.exists()) {
+                    await setDoc(doc(db, '/users/' + authContext.user?.uid + '/games/', data.id), {
+                        id: data.id,
+                        category: data.category,
+                        player: data.player,
+                        result: points.host.count > points.player.count ? ('win') : (points.host.count < points.player.count ? ('lose') : ('draw')),
+                    })
+                }
             }
         }
         saveGame();

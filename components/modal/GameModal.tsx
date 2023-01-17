@@ -11,6 +11,7 @@ import { db } from "../../firebase";
 import { BsCheckLg } from "react-icons/bs";
 import { GameContext } from "../../context/GameContext";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 function GameModal({ category, setMenu }: {category: Category, setMenu: Function}) {
     const [mode, setMode] = useState<'solo' | 'vs'>('solo');
@@ -26,9 +27,11 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
 
     useEffect(() => {
         if(mode === 'vs' && user) {
-            webContext?.emit('get_friends_activity', user.friends, (response: any) => {
-                setOnlineFriendsIDS(response);
-            });
+            const getFriends = async () => {
+                const response = await axios.post('/api/socket', { type: 'get_friends', data: user.friends} );
+                setOnlineFriendsIDS(response.data);
+            }
+            getFriends();
         }
     }, [mode])
 
@@ -75,8 +78,12 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
                 answers: {host: Array<string>(), player: Array<string>()},
             } as Game
             gameContext?.setGame(game);
-            webContext?.emit('game_request', game);
             router.push('/game');
+            console.log(gameContext?.game);
+            const sendRequest = async (game: Game) => {
+                await axios.post('/api/socket', {type: 'send_request', data: game})
+            }
+            sendRequest(game);
         }  else if (mode == 'solo') {
             // Solo mode
             const questions = await getRandomQuestions(category.id);

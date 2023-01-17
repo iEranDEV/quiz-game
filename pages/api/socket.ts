@@ -1,66 +1,60 @@
-import { Server } from 'socket.io';
+import Pusher from "pusher";
 
-const users = new Map<string, string>();
+const users = Array<string>();
 
-const SocketHandler = (req: any, res: any) => {
-    if(!res.socket.server.io) {
-        const io = new Server(res.socket.server);
-        res.socket.server.io = io;
+export const pusher = new Pusher({
+    appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID as string,
+    key: process.env.NEXT_PUBLIC_PUSHER_KEY as string,
+    secret: process.env.NEXT_PUBLIC_PUSHER_SECRET as string,
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
+    useTLS: true,
+});
 
-        io.on('connection', (socket) => {
+export default async function handler(req: any, res: any) {
+    const { type, id, data } = req.body;
 
-            // User disconnect event
-            socket.on('disconnect', () => {
-                const id = [...Array.from(users.entries())].find((item) => item[1] === socket.id);
-                if(id) {
-                    users.delete(id[0]);
-                }
-            })
-
-            // Initialize user connection to storage
-            socket.on('user_connect', (id: string) => {
-                users.set(id, socket.id);
-                console.log(`Initialized connection with user (${id}), id: ${socket.id}`);
-            })
-
-            // Get friends activity
-            socket.on('get_friends_activity', (friends: Array<string>, callback) => {
-                const arr = Array<string>();
-                friends.forEach((item) => {
-                    if(users.has(item)) arr.push(item);
+    switch(type) {
+        case 'connect':
+            if(!users.includes(id)) users.push(id);
+            res.json();
+            break;
+        case 'disconnect':
+            users.splice(users.findIndex(element => element === id), 1);
+            res.json();
+            break;
+        case 'get_friends':
+            const toReturn = Array<string>();
+            console.log(users);
+            console.log(data);
+            if(data) {
+                (data as Array<string>).forEach((element: any) => {
+                    if(users.includes(element)) toReturn.push(element);
                 })
-                callback(arr);
+            }
+            res.json(toReturn);
+            break;
+        case 'send_request':
+            pusher.trigger(data.player, "send_request", {
+                data: data,
             })
-
-            // User sent game request to server (sent it to player)
-            socket.on('game_request', (game: Game) => {
-                if(users.get(game.player as string)) {
-                    socket.to(users.get(game.player as string) as string).emit('game_request', game);
-                }
+            res.json();
+            break;
+        case 'accept_request':
+            const newGame = JSON.parse(JSON.stringify(data)) as Game;
+            const host = newGame.host;
+            pusher.trigger(host, "start_game", {
+                id: newGame.id,
+            });
+            newGame.host = id;
+            newGame.player = host;
+            newGame.loading = false;
+            res.json({game: newGame});
+            break;
+        case 'update':
+            pusher.trigger(data.player, 'update', {
+                playerPoints: data.answers.host,
             })
-
-            // User accepted request
-            socket.on('accept_request', (game: Game, callback) => {
-                if(users.get(game.host) && users.get(game.player as string)) {
-                    socket.to(users.get({...game}.host) as string).emit('start_game', game);
-                    const newGame = JSON.parse(JSON.stringify(game)) as Game;
-                    const host = game.host;
-                    newGame.host = game.player as string;
-                    newGame.player = host;
-                    newGame.loading = false;
-                    callback(newGame);
-                }
-            })
-
-            // Game update
-            socket.on('game_update', (game: Game) => {
-                if(users.get(game.player as string)) {
-                    socket.to(users.get((game.player as string)) as string).emit('game_update', game);
-                }
-            })
-        })
+            res.json();
+            break;
     }
-    res.end();
 }
-
-export default SocketHandler;
