@@ -2,7 +2,7 @@
   "name": "quiz-game",
   "version": "0.1.0",
   "engines": {
-    "node": "16.15.0"
+    "node": "16.x"
   },
   "private": true,
   "scripts": {
