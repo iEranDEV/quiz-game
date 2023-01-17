@@ -25,6 +25,16 @@ function Requests({ setMenu }: { setMenu: Function }) {
     }
     
     useEffect(() => {
+        const syncData = async () => {
+            if(user) {
+                let arr = Array<User>();
+                for (const friend of user.friendRequests) {
+                    const friendSnap = await getDoc(doc(db, "users", friend));
+                    if(friendSnap.exists()) arr.push(friendSnap.data() as User);
+                }
+                setRequests(arr);
+            }
+        }
         syncData();
     }, []);
 

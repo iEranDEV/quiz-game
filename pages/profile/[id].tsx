@@ -133,30 +133,34 @@ function ProfilePage() {
 
     return (
         <Layout>
-            <div className="w-full h-full flex flex-col gap-8 md:py-4">
+            <div className="w-full h-full flex flex-col gap-4 md:py-4">
                 <div className="w-full flex justify-between items-start">
                     <div className="flex flex-col gap-2">
                         {user?.photoURL && <img src={user.photoURL} className='w-20 h-20 rounded-full'/>}
-                        <p className="text-primary-100 text-xl font-semibold">{user?.username}</p>
+                        <p className="text-stone-50 text-xl font-semibold">{user?.username}</p>
                     </div>
 
                     {actionButton()}
                 </div>
-                <div className="w-full flex justify-center items-center">
-                    <div className="w-full md:w-96 py-4 border-y border-primary-300 flex justify-around items-center">
+                <p className="text-primary-100 flex gap-2 items-center">Total games played: 
+                    <span className="font-bold text-xl">{games.length}</span>
+                </p>
+                <div className="w-full flex flex-col gap-2 justify-center items-center">
+                    <p className="text-primary-100 font-lg font-bold uppercase">Multiplayer games stats</p>
+                    <div className="w-full md:w-96 py-4 border-y-2 border-primary-300 flex justify-around items-center">
                         {/* Wins */}
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-green-500">
-                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'win').length}</h1>
+                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'win' && game.player != null).length}</h1>
                             <p className="font-bold">WINS</p>
                         </div>
                         {/* Draws */}
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-orange-300">
-                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'draw').length}</h1>
+                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'draw' && game.player != null).length}</h1>
                             <p className="font-bold">DRAWS</p>
                         </div>
                         {/* Loses */}
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-red-400">
-                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'lose').length}</h1>
+                            <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'lose' && game.player != null).length}</h1>
                             <p className="font-bold">LOSES</p>
                         </div>
                     </div>
