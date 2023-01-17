@@ -90,8 +90,6 @@ function GamePage() {
 
     return (
         <Layout>
-            <>
-            {game?.id}
             {game?.loading ? 
                 (<div className='w-full h-full flex flex-col gap-4 justify-center items-center'>
                     <AiOutlineLoading3Quarters className='w-10 h-10 text-primary-100 animate-spin'></AiOutlineLoading3Quarters>
@@ -155,7 +153,6 @@ function GamePage() {
                     }
                 </>
             }
-            </>
         </Layout>
     )
 }
