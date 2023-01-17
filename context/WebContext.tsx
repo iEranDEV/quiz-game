@@ -73,6 +73,7 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             })
 
             return () => {
+                userChannel?.unbind("start_game");
                 instance?.unsubscribe(game.id);
                 setChannel(undefined);
             }

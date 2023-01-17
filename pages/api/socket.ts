@@ -1,13 +1,12 @@
-import Pusher from "pusher";
+import Channels from "pusher";
 
 const users = Array<string>();
 
-export const pusher = new Pusher({
+export const pusher = new Channels({
     appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID as string,
     key: process.env.NEXT_PUBLIC_PUSHER_KEY as string,
     secret: process.env.NEXT_PUBLIC_PUSHER_SECRET as string,
     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
-    useTLS: true,
 });
 
 export default async function handler(req: any, res: any) {
@@ -24,8 +23,6 @@ export default async function handler(req: any, res: any) {
             break;
         case 'get_friends':
             const toReturn = Array<string>();
-            console.log(users);
-            console.log(data);
             if(data) {
                 (data as Array<string>).forEach((element: any) => {
                     if(users.includes(element)) toReturn.push(element);
