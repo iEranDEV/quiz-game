@@ -97,7 +97,7 @@ function Requests({ setMenu }: { setMenu: Function }) {
             :
                 <div className="w-full h-full flex justify-center items-center flex-col gap-4 text-primary-100">
                     <TbMoodEmpty className="w-8 h-8"></TbMoodEmpty>
-                    <p>You don't have any friend requests</p>
+                    <p>You dont have any friend requests</p>
                 </div>
             }
         </div>

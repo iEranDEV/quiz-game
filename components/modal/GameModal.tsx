@@ -32,17 +32,16 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
         }
     }, [mode])
 
-    const syncFriendsData = async () => {
-        const arr = Array<User>();
-        for(const friend of onlineFriendsIDS) {
-            const docSnap = await getDoc(doc(db, "users", friend));
-            if(docSnap.exists()) arr.push(docSnap.data() as User);
-        }
-        setOnlineFriends(arr);
-    }
-
     useEffect(() => {
         if(onlineFriendsIDS.length >= 1) {
+            const syncFriendsData = async () => {
+                const arr = Array<User>();
+                for(const friend of onlineFriendsIDS) {
+                    const docSnap = await getDoc(doc(db, "users", friend));
+                    if(docSnap.exists()) arr.push(docSnap.data() as User);
+                }
+                setOnlineFriends(arr);
+            }
             syncFriendsData();
         }
     }, [onlineFriendsIDS])
@@ -126,7 +125,7 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
                                 {onlineFriends.map((friend) => {
                                     return (
                                         <div onClick={() => setSelectedFriend(friend)} key={friend.uid} className={`w-full p-2 hover:bg-primary-300/50 cursor-pointer text-stone-50 flex gap-4 items-center ${selectedFriend?.uid === friend.uid && 'bg-primary-300/30'}`}>
-                                            {friend.photoURL && <img src={friend.photoURL} className='h-8 w-8 rounded-full' />}
+                                            {friend.photoURL && <img src={friend.photoURL} className='h-8 w-8 rounded-full' alt={friend.username} />}
                                             <p>{friend.username}</p>
                                             {selectedFriend?.uid === friend.uid && <div className="w-full h-full flex justify-end items-center px-2">
                                                 <BsCheckLg className="h-5 w-5 text-green-500"></BsCheckLg>
