@@ -61,6 +61,7 @@ function GamePage() {
                 else newGame.answers.host.push('');
                 if(game.mode === 'vs') {
                     const sendUpdate = async () => {
+                        console.log('sent update')
                         await axios.post('/api/socket', {type: 'update', data: newGame});
                     }
                     sendUpdate();

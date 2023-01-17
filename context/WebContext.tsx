@@ -28,6 +28,7 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             const userChannel = pusher.subscribe(user.uid);
 
             userChannel.bind("send_request", (data: any) => {
+                console.log('got game request');
                 gameContext?.setRequests([...gameContext.requests, data.data]);
             })
 
@@ -57,6 +58,7 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             userChannel?.bind("start_game", (id: {id: string}) => {
                 const startGame = (id: {id: string}) => {
                     if(game?.id === id.id) {
+                        console.log('started game');
                         const newGame = JSON.parse(JSON.stringify(game)) as Game;
                         newGame.loading = false;
                         gameContext?.setGame(newGame);
@@ -66,6 +68,7 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
             })
 
             userChannel?.bind('update', (data: {playerPoints: Array<string>}) => {
+                console.log('got update');
                 gameContext.setPlayerPoints(data.playerPoints);
             })
 
@@ -74,7 +77,7 @@ export const WebContextProvider = ({ children }: {children: JSX.Element}) => {
                 setChannel(undefined);
             }
         }
-    }, [game]);
+    }, [game?.id]);
 
     return (
         //@ts-ignore
