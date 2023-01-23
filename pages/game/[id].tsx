@@ -144,13 +144,13 @@ function GamePage() {
                         {player === 'host' ?
                             <div className='flex gap-1'>
                                 {[...Array(6)].map((e, i) => (
-                                    <div className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
+                                    <div key={crypto.randomUUID()} className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
                                 ))}
                             </div>
                         :
                             <div className='flex gap-1'>
                                 {[...Array(6)].map((e, i) => (
-                                    <div className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
+                                    <div key={crypto.randomUUID()} className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
                                 ))}
                             </div>
                         }
@@ -164,13 +164,13 @@ function GamePage() {
                         {player === 'host' ?
                             <div className='flex gap-1'>
                                 {[...Array(6)].map((e, i) => (
-                                    <div className={`w-2 h-2 rounded-full ${game?.data.player?.correct[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
+                                    <div key={crypto.randomUUID()} className={`w-2 h-2 rounded-full ${game?.data.player?.correct[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
                                 ))}
                             </div>
                         :
                             <div className='flex gap-1'>
                                 {[...Array(6)].map((e, i) => (
-                                    <div className={`w-2 h-2 rounded-full ${game?.data.host.correct[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
+                                    <div key={crypto.randomUUID()} className={`w-2 h-2 rounded-full ${game?.data.host.correct[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
                                 ))}
                             </div>
                         }
