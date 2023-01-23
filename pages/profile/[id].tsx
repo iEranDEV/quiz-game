@@ -10,7 +10,6 @@ import { db } from "../../firebase";
 
 function ProfilePage() {
     const [user, setUser] = useState<User | null>(null);
-    const [games, setGames] = useState(Array<GameResult>());
 
     const router = useRouter();
 
@@ -34,6 +33,7 @@ function ProfilePage() {
 
     useEffect(() => {
         if(user) {
+            /*
             const getGames = async () => {
                 const arr = Array<GameResult>();
                 const q = query(collection(db, "users/" + user?.uid + '/games'));
@@ -42,6 +42,7 @@ function ProfilePage() {
                 setGames(arr);
             }
             getGames();
+            */
         }
     }, [user]);
 
@@ -143,26 +144,25 @@ function ProfilePage() {
                     {actionButton()}
                 </div>
                 <p className="text-primary-100 flex gap-2 items-center">Total games played: 
-                    <span className="font-bold text-xl">{games.length}</span>
+                    {/*<span className="font-bold text-xl">{games.length}</span>*/}
                 </p>
                 <div className="w-full flex flex-col gap-2 justify-center items-center">
                     <p className="text-primary-100 font-lg font-bold uppercase">Multiplayer games stats</p>
                     <div className="w-full md:w-96 py-4 border-y-2 border-primary-300 flex justify-around items-center">
-                        {/* Wins */}
+                        {/*
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-green-500">
                             <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'win' && game.player != null).length}</h1>
                             <p className="font-bold">WINS</p>
                         </div>
-                        {/* Draws */}
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-orange-300">
                             <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'draw' && game.player != null).length}</h1>
                             <p className="font-bold">DRAWS</p>
                         </div>
-                        {/* Loses */}
                         <div className="h-full p-2 flex flex-col justify-center items-center gap-2 text-red-400">
                             <h1 className="text-4xl font-bold">{games.filter(game => game.result === 'lose' && game.player != null).length}</h1>
                             <p className="font-bold">LOSES</p>
                         </div>
+                        */}
                     </div>
                 </div>
             </div>
