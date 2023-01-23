@@ -1,28 +1,18 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import Button from "../components/Button";
 import Layout from "../components/layout/Layout";
 import GameModal from "../components/modal/GameModal";
-import { AuthContext } from "../context/AuthContext";
 import { GameContext } from "../context/GameContext";
-import { WebContext } from "../context/WebContext";
 import { db } from "../firebase";
 import { IoGameControllerOutline } from 'react-icons/io5';
-import { TbCheck, TbX } from "react-icons/tb";
-import { useRouter } from "next/router";
-import axios from "axios";
 
 export default function Home() {
 	const [categories, setCategories] = useState(Array<Category>());
 	const [gameModal, setGameModal] = useState<Category | null>(null);
 	const [requestsMenu, setRequestsMenu] = useState(false);
-	const [requestsData, setRequestsData] = useState(Array<{user: User, category: Category, game: Game}>());
 
 	const gameContext = useContext(GameContext);
-	const webContext = useContext(WebContext);
-	const authContext = useContext(AuthContext);
-
-	const router = useRouter();
 
 	const getAllCategories = async () => {
         const arr = Array<Category>();
@@ -33,44 +23,16 @@ export default function Home() {
         setCategories(arr);
     }
 
-	const syncRequestsData = async () => {
-		const arr = Array<{user: User, category: Category, game: Game}>();
-		if(gameContext?.requests) {
-			for(const item of gameContext?.requests) {
-				const docSnap = await getDoc(doc(db, "users", item.host));
-				if(docSnap.exists()) arr.push({
-					user: docSnap.data() as User, 
-					category: categories.find(element => element.id === item.category) as Category,
-					game: item,
-				})
-			}
-		}
-		setRequestsData(arr);
-	}
-
 	useEffect(() => {
 		getAllCategories();
 	}, [])
 
-	useEffect(() => {
-		syncRequestsData();
-	}, [gameContext?.requests])
-
-	const acceptRequest = async (request: {user: User, category: Category, game: Game}) => {
-		const response = await axios.post('/api/socket', {type: 'accept_request', id: authContext.user?.uid,data: request.game});
-		if(response) {
-			gameContext?.setGame(response.data.game as Game);
-			router.push('/game');
-		}
-		const newRequests = JSON.parse(JSON.stringify(gameContext?.requests)) as Array<Game>;
-		newRequests.splice(newRequests.findIndex((item) => item.id == request.game.id), 1);
-		gameContext?.setRequests(newRequests);
+	const acceptRequest = async (request: any) => {
+		
 	}
 
-	const declineRequest = async (request: {user: User, category: Category, game: Game}) => {
-		const newRequests = JSON.parse(JSON.stringify(gameContext?.requests)) as Array<Game>;
-		newRequests.splice(newRequests.findIndex((item) => item.id == request.game.id), 1);
-		gameContext?.setRequests(newRequests);
+	const declineRequest = async (request: any) => {
+		
 	}
 
 	return (
@@ -83,7 +45,7 @@ export default function Home() {
 						<div className="w-3 h-3 bg-green-500 absolute top-0 right-0 rounded-full border-2 border-primary-200"></div>
 					}
 					{requestsMenu && <div className="w-full flex flex-col md:w-96 h-96 bg-primary-300 absolute right-0 top-full rounded-xl p-4">
-						{requestsData.map((item) => {
+						{/*requestsData.map((item) => {
 							return (
 								<div key={item.game.id} className='w-full flex items-center justify-between'>
 									<div className="flex gap-4 items-center">
@@ -103,7 +65,7 @@ export default function Home() {
 									</div>
 								</div>
 							)
-						})}
+						})*/}
 					</div>}
 				</div>
 				<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4">

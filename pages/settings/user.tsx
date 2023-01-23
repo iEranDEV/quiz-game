@@ -58,10 +58,6 @@ function UserSettings() {
             username: username,
             photoURL: url != null ? url : photo,
         }).then(() => {
-            let newUser = {...user} as User;
-            newUser.username = username as string;
-            newUser.photoURL = (url != null ? url : photo);
-            authContext.setUser(newUser);
             router.push('/')
             notificationContext.addNotification({
                 id: crypto.randomUUID(),

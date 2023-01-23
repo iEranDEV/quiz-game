@@ -13,7 +13,7 @@ function NavBar({ menu, setMenu }: {menu: boolean, setMenu: Function}) {
 
     const router = useRouter();
 
-    const friendsNotification = (user && user.friendRequests.length >= 1 ? true : false)
+    // const friendsNotification = (user && user.friendRequests.length >= 1 ? true : false)
 
     return (
         <nav className="z-50 flex w-full md:w-auto items-center p-4 md:p-0">
@@ -37,7 +37,7 @@ function NavBar({ menu, setMenu }: {menu: boolean, setMenu: Function}) {
                         <div className={`navLink ${router.pathname === '/friends' && 'bg-primary-400/30 md:border-r-4 md:border-orange-300'}`}>
                             <TbUsers className='w-5 h-5 text-orange-300'></TbUsers>
                             <p>Friends</p>
-                            {friendsNotification && <p className="bg-primary-200 text-stone-50 rounded-full p-1 text-xs">{user?.friendRequests.length}</p>}
+                            {/*friendsNotification && <p className="bg-primary-200 text-stone-50 rounded-full p-1 text-xs">{user?.friendRequests.length}</p>*/}
                         </div>
                     </Link>
                     <Link href={"/profile/" + user?.uid} className='w-full'>

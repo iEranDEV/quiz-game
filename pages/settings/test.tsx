@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Layout from "../../components/layout/Layout";
 import SettingsLayout from "../../components/layout/SettingsLayout";
 

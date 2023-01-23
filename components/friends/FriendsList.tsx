@@ -5,28 +5,14 @@ import { useEffect, useState, useContext } from "react";
 import { TbMoodCry, TbUserExclamation, TbUserPlus, TbUserX } from "react-icons/tb";
 import { AuthContext } from "../../context/AuthContext";
 import { NotificationContext } from "../../context/NotificationContext";
-import { WebContext } from "../../context/WebContext";
 import { db } from "../../firebase";
 
 function FriendsList({ searchQuery }: { searchQuery: string | null }) {
     const [results, setResults] = useState(Array<User>());
-    const [onlineFriends, setOnlineFriends] = useState(Array<string>());
 
     const notificationContext = useContext(NotificationContext);
     const authContext = useContext(AuthContext);
-    const webContext = useContext(WebContext);
     const user = authContext.user;
-
-    useEffect(() => {
-        if(user) {
-            const getFriends = async () => {
-                console.log(user?.friends)
-                const response = await axios.post('/api/socket', { type: 'get_friends', arr: user?.friends} );
-                setOnlineFriends(response.data);
-            }
-            getFriends();
-        }
-    }, [user]);
 
     const syncData = async () => {
         if(user) {
@@ -57,16 +43,14 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
 
     const sendRequest = async (result: User) => {
         if(user) {
-            let resultCopy = JSON.parse(JSON.stringify(result)) as User;
-            resultCopy.friendRequests.push(user.uid)
-            await updateDoc(doc(db, "users", resultCopy.uid), {
+            await updateDoc(doc(db, "users", result.uid), {
                 friendRequests: arrayUnion(user.uid),
             }).then(() => {
                 syncData();
                 notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'success',
-                    message: `Sent friend request to ${resultCopy.username}!`
+                    message: `Sent friend request to ${result.username}!`
                 })
             })
         }
@@ -74,7 +58,6 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
 
     const cancelRequest = async (result: User) => {
         if(user) {
-            let resultCopy = JSON.parse(JSON.stringify(result)) as User;
             await updateDoc(doc(db, "users", result.uid), {
                 friendRequests: arrayRemove(user.uid)
             }).then(() => {
@@ -82,7 +65,7 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                 notificationContext.addNotification({
                     id: crypto.randomUUID(),
                     type: 'info',
-                    message: `Canceled friend request to ${resultCopy.username}!`
+                    message: `Canceled friend request to ${result.username}!`
                 })
             })
         }
@@ -90,9 +73,6 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
 
     const removeFriend = async (result: User) => {
         if(user) {
-            let userCopy = JSON.parse(JSON.stringify(user)) as User;
-            userCopy.friends.splice(userCopy.friends.findIndex(element => element === result.uid), 1);
-            authContext.setUser(userCopy);
             await updateDoc(doc(db, "users", user.uid), {
                 friends: arrayRemove(result.uid)
             })
@@ -131,10 +111,9 @@ function FriendsList({ searchQuery }: { searchQuery: string | null }) {
                         return (
                             <Link key={result.uid} href={'/profile/' + result.uid}>
                                 <div className="flex justify-between items-center py-2">
-                                    <div className="flex gap-4 w-full items-center relative">
+                                    <div className="flex gap-4 w-full items-center">
                                         <img src={result.photoURL as string} alt={result.username} className='rounded-full h-7 w-7' />
                                         <p>{result.username}</p>
-                                        {onlineFriends.includes(result.uid) && <div className="w-3 h-3 bg-green-500 rounded-full absolute -top-1 -left-1 border-2 border-primary-200"></div>}
                                     </div>
                                     {renderIcon(result)}
                                 </div>

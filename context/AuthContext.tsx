@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/router";
 import React, { useEffect, useState, createContext } from "react";
 import { auth, db } from "../firebase";
@@ -30,6 +30,7 @@ export const AuthContextProvider = ({ children }: {children: JSX.Element}) => {
 
     // State instance
     const [user, setUserState] = useState<User | null>(null);
+    const [id, setID] = useState<string | null>(null);
     const [loading, setLoadingState] = useState<boolean>(false);
 
     // Function ran only on application load
@@ -38,22 +39,27 @@ export const AuthContextProvider = ({ children }: {children: JSX.Element}) => {
             console.log(data)
             if(data) {
                 setLoading(true);
-                const userSnap = await getDoc(doc(db, "users", data.uid));
-                if(userSnap.exists()) {
-                    setUser(userSnap.data() as User);
-                    setLoading(false);
-                } else {
-                    router.push('/accounts/login');
-                    setLoading(false);
-                    setUser(null);
-                }
+                setID(data.uid)
             } else {
-                setUser(null);
+                setID(null);
                 router.push('/accounts/login');
             }
         })
         authSession();
     }, []);
+
+    useEffect(() => {
+        if(id) {
+            const unsubscribe = onSnapshot(doc(db, "users", id), (doc) => {
+                setUser(doc.data() as User);
+                setLoading(false);
+            });
+
+            return () => {
+                unsubscribe();
+            }
+        }
+    }, [id]);
 
     return (
         <AuthContext.Provider value={{user: user, setUser: setUserState, loading: loading, setLoading: setLoadingState}}>

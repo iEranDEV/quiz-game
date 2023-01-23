@@ -4,7 +4,6 @@ import { GrGamepad } from 'react-icons/gr';
 import { useContext, useEffect, useState } from "react";
 import { FiUser, FiUsers } from 'react-icons/fi';
 import { FaRegSadTear } from "react-icons/fa";
-import { WebContext } from "../../context/WebContext";
 import { AuthContext } from "../../context/AuthContext";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -20,7 +19,6 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
     const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
 
     const router = useRouter();
-    const webContext = useContext(WebContext);
     const authContext = useContext(AuthContext);
     const gameContext = useContext(GameContext);
     const user = authContext.user;
@@ -64,41 +62,7 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
     }
 
     const handleClick = async () => {
-        if(mode === 'vs' && selectedFriend) {
-            // Vs mode (selected friend)
-            const questions = await getRandomQuestions(category.id);
-            const game = {
-                id: crypto.randomUUID(),
-                host: user?.uid,
-                player: selectedFriend.uid,
-                questions: questions,
-                mode: 'vs',
-                loading: true,
-                category: category.id,
-                answers: {host: Array<string>(), player: Array<string>()},
-            } as Game
-            gameContext?.setGame(game);
-            router.push('/game');
-            console.log(gameContext?.game);
-            const sendRequest = async (game: Game) => {
-                await axios.post('/api/socket', {type: 'send_request', data: game})
-            }
-            sendRequest(game);
-        }  else if (mode == 'solo') {
-            // Solo mode
-            const questions = await getRandomQuestions(category.id);
-            gameContext?.setGame({
-                id: crypto.randomUUID(),
-                host: user?.uid,
-                player: null,
-                questions: questions,
-                mode: 'solo',
-                loading: false,
-                category: category.id,
-                answers: {host: Array<string>(), player: Array<string>()},
-            } as Game);
-            router.push('/game');
-        }
+        
     }
 
     return (

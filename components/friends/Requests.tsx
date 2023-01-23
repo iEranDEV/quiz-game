@@ -25,23 +25,10 @@ function Requests({ setMenu }: { setMenu: Function }) {
     }
     
     useEffect(() => {
-        const syncData = async () => {
-            if(user) {
-                let arr = Array<User>();
-                for (const friend of user.friendRequests) {
-                    const friendSnap = await getDoc(doc(db, "users", friend));
-                    if(friendSnap.exists()) arr.push(friendSnap.data() as User);
-                }
-                setRequests(arr);
-            }
-        }
         syncData();
     }, []);
 
     const acceptRequest = async (request: User) => {
-        const newUser = JSON.parse(JSON.stringify(user)) as User;
-        newUser.friends.push(request.uid);
-        newUser.friendRequests.splice(newUser.friendRequests.findIndex(element => element === request.uid), 1);
         await updateDoc(doc(db, "users", user?.uid as string), {
             friendRequests: arrayRemove(request.uid),
             friends: arrayUnion(request.uid),
@@ -49,7 +36,6 @@ function Requests({ setMenu }: { setMenu: Function }) {
         await updateDoc(doc(db, "users", request.uid), {
             friends: arrayUnion(user?.uid),
         })
-        authContext.setUser(newUser);
         syncData();
         notificationContext.addNotification({
             id: crypto.randomUUID(),
@@ -61,12 +47,9 @@ function Requests({ setMenu }: { setMenu: Function }) {
 
     const declineRequest = async (request: User) => {
         if(user) {
-            const newUser = JSON.parse(JSON.stringify(user)) as User;
-            newUser.friendRequests.splice(newUser.friendRequests.findIndex(element => element === request.uid), 1);
             await updateDoc(doc(db, "users", user.uid), {
                 friendRequests: arrayRemove(request.uid)
             })
-            authContext.setUser(newUser);
             syncData();
             setMenu(false);
         }
