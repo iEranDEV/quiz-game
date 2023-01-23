@@ -9,16 +9,23 @@ import Button from '../../components/Button';
 
 
 // Update data
-const updateData = async (gameID: string | undefined, selectedAnswer: string | null, question: Question | null, player: 'host' | 'player' | null) => {
+const updateData = async (gameID: string | undefined, selectedAnswer: string | null, question: Question | null, player: 'host' | 'player' | null, points: Array<boolean>) => {
     if(gameID && question && player) {
         if(player === 'host') {
+            console.log('host');
+            const val = JSON.parse(JSON.stringify(points)) as boolean[];
+            val.push(selectedAnswer === question.correctAnswer ? true : false);
             await updateDoc(doc(db, "games", gameID), {
                 "data.host.answers": arrayUnion(selectedAnswer),
-            })
+                "data.host.correct": val,
+            });
         } else if(player === 'player') {
+            const val = JSON.parse(JSON.stringify(points)) as boolean[];
+            val.push(selectedAnswer === question.correctAnswer ? true : false);
             await updateDoc(doc(db, "games", gameID), {
                 "data.player.answers": arrayUnion(selectedAnswer),
-            })
+                "data.player.correct": val,
+            });
         }
     }
 }
@@ -37,6 +44,7 @@ function GamePage() {
     const [player, setPlayer] = useState<'host' | 'player' | null>(null);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [opponent, setOpponent] = useState<User | null>(null);
+    const [points, setPoints] = useState(Array<boolean>());
 
     useEffect(() => {
         if(game?.status === 'quiz') {
@@ -47,7 +55,8 @@ function GamePage() {
     useEffect(() => {
         if(status === 'results') {
             if(questions) {
-                updateData(game?.id, selectedAnswer, questions[0], player)
+                updateData(game?.id, selectedAnswer, questions[0], player, (user?.uid === game?.data.host.uid ? game?.data.host.correct as boolean[] : (game?.data.player?.correct as boolean[])));
+                setPoints([...points, selectedAnswer === questions[0].correctAnswer ? true : false]);
             }
 
             setTimeout(() => {
@@ -135,18 +144,39 @@ function GamePage() {
                         {player === 'host' ?
                             <div className='flex gap-1'>
                                 {[...Array(6)].map((e, i) => (
-                                    <div className={`w-2 h-2 rounded-full ${game?.questions[i].correctAnswer === game?.data.host.answers[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
+                                    <div className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
                                 ))}
                             </div>
                         :
                             <div className='flex gap-1'>
-                                    
+                                {[...Array(6)].map((e, i) => (
+                                    <div className={`w-2 h-2 rounded-full ${points[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
+                                ))}
                             </div>
                         }
                     </div>
                 </div>
 
                 {/* Opponent profile */}
+                {opponent && <div className='flex gap-4 items-center justify-center'>
+                    <div className='h-full flex flex-col justify-between items-end'>
+                        <p className='font-bold'>{opponent?.username}</p>
+                        {player === 'host' ?
+                            <div className='flex gap-1'>
+                                {[...Array(6)].map((e, i) => (
+                                    <div className={`w-2 h-2 rounded-full ${game?.data.player?.correct[i] ? 'bg-green-400' : (i >= (game?.data.player?.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
+                                ))}
+                            </div>
+                        :
+                            <div className='flex gap-1'>
+                                {[...Array(6)].map((e, i) => (
+                                    <div className={`w-2 h-2 rounded-full ${game?.data.host.correct[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-400' : 'bg-red-400')}`}></div>
+                                ))}
+                            </div>
+                        }
+                    </div>
+                    {opponent?.photoURL && <img src={opponent?.photoURL} className={'w-10 h-10 rounded-full'} />}
+                </div>}
             </div>
         )
     }
@@ -166,7 +196,7 @@ function GamePage() {
                                     {renderPlayerProfiles()}
 
                                     {/* Question with answers */}
-                                    {questions && <div className='w-full flex flex-col items-center justify-center gap-16'>
+                                    {questions?.length && questions?.length >= 1 && <div className='w-full flex flex-col items-center justify-center gap-16'>
                                         <h1 className='text-2xl font-bold'>{questions[0].question}</h1>
                                         <div className='w-full grid gap-4 grid-cols-1 md:grid-cols-2'>
                                             {[...Array(4)].map((e, i) => renderAnswerButton(i))}
