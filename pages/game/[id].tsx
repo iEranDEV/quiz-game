@@ -2,7 +2,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import Layout from '../../components/layout/Layout';
-import { arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Countdown from '../../components/game/Countdown';
 import Button from '../../components/Button';
@@ -36,6 +36,7 @@ function GamePage() {
     const [questions, setQuestions] = useState<Array<Question> | null>(null);
     const [player, setPlayer] = useState<'host' | 'player' | null>(null);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [opponent, setOpponent] = useState<User | null>(null);
 
     useEffect(() => {
         if(game?.status === 'quiz') {
@@ -87,8 +88,20 @@ function GamePage() {
     }, [id]);
 
     useEffect(() => {
+        if(game?.players && game.mode === 'vs' && opponent === null) {
+            const syncOpponent = async () => {
+                const id = game.players[0] === user?.uid ? game.players[1] : game.players[0];
+                const docSnap = await getDoc(doc(db, "users", id as string));
+                if(docSnap.exists()) {
+                    setOpponent(docSnap.data() as User);
+                }
+            }
+            syncOpponent();
+        }
+    }, [game?.players])
+
+    useEffect(() => {
         if(questions === null && game) {
-            console.log('set questions');
             setQuestions(JSON.parse(JSON.stringify(game?.questions)) as Array<Question>);
         }
     }, [game]);
@@ -111,6 +124,33 @@ function GamePage() {
         }
     }
 
+    const renderPlayerProfiles = () => {
+        return (
+            <div className='w-full flex justify-between items-center'>
+                {/* Player profile */}
+                <div className='flex gap-4 items-center justify-center'>
+                    {user?.photoURL && <img src={user?.photoURL} className={'w-10 h-10 rounded-full'} />}
+                    <div className='h-full flex flex-col justify-between'>
+                        <p className='font-bold'>{user?.username}</p>
+                        {player === 'host' ?
+                            <div className='flex gap-1'>
+                                {[...Array(6)].map((e, i) => (
+                                    <div className={`w-2 h-2 rounded-full ${game?.questions[i].correctAnswer === game?.data.host.answers[i] ? 'bg-green-400' : (i >= (game?.data.host.answers.length as number) ? 'bg-stone-200' : 'bg-red-400')}`}></div>
+                                ))}
+                            </div>
+                        :
+                            <div className='flex gap-1'>
+                                    
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                {/* Opponent profile */}
+            </div>
+        )
+    }
+
     return (
         <Layout>
             <div className='w-full h-full flex flex-col justify-center items-center gap-4'>
@@ -123,9 +163,7 @@ function GamePage() {
                                 <Countdown questions={questions} mode={status} setMode={setStatus}></Countdown>
                                 <div className='w-full h-full md:p-4 flex flex-col gap-4'>
                                     {/* Players points and profiles */}
-                                    <div>
-
-                                    </div>
+                                    {renderPlayerProfiles()}
 
                                     {/* Question with answers */}
                                     {questions && <div className='w-full flex flex-col items-center justify-center gap-16'>
