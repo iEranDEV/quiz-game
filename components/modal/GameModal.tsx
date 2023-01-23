@@ -1,51 +1,37 @@
 import Button from "../Button";
 import Modal from "./Modal";
 import { GrGamepad } from 'react-icons/gr';
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import { FiUser, FiUsers } from 'react-icons/fi';
 import { FaRegSadTear } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { BsCheckLg } from "react-icons/bs";
-import { GameContext } from "../../context/GameContext";
 import { useRouter } from "next/router";
-import axios from "axios";
 
 function GameModal({ category, setMenu }: {category: Category, setMenu: Function}) {
     const [mode, setMode] = useState<'solo' | 'vs'>('solo');
-    const [onlineFriendsIDS, setOnlineFriendsIDS] = useState(Array<string>());
-    const [onlineFriends, setOnlineFriends] = useState(Array<User>());
     const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+    const [friends, setFriends] = useState(Array<User>());
 
     const router = useRouter();
     const authContext = useContext(AuthContext);
-    const gameContext = useContext(GameContext);
     const user = authContext.user;
 
     useEffect(() => {
-        if(mode === 'vs' && user) {
-            const getFriends = async () => {
-                const response = await axios.post('/api/socket', { type: 'get_friends', data: user.friends} );
-                setOnlineFriendsIDS(response.data);
-            }
-            getFriends();
-        }
-    }, [mode])
-
-    useEffect(() => {
-        if(onlineFriendsIDS.length >= 1) {
-            const syncFriendsData = async () => {
-                const arr = Array<User>();
-                for(const friend of onlineFriendsIDS) {
+        const syncFriends = async () => {
+            const arr = Array<User>();
+            if(user?.friends) {
+                for(const friend of user?.friends) {
                     const docSnap = await getDoc(doc(db, "users", friend));
                     if(docSnap.exists()) arr.push(docSnap.data() as User);
                 }
-                setOnlineFriends(arr);
             }
-            syncFriendsData();
+            setFriends(arr);
         }
-    }, [onlineFriendsIDS])
+        syncFriends();
+    }, [user?.friends]);
 
     const getRandomQuestions = async (categoryID: string) => {
         const arr = Array<Question>();
@@ -62,7 +48,61 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
     }
 
     const handleClick = async () => {
-        
+        if(mode === 'solo' && user) {
+            // Solo quiz
+            const id = crypto.randomUUID();
+            const game: Game = {
+                id: id,
+                players: [user.uid, null],
+                questions: await getRandomQuestions(category.id),
+                mode: "solo",
+                status: "quiz",
+                data: {
+                    host: {
+                        uid: user.uid,
+                        answers: Array<string | null>(),
+                        correct: Array<boolean>()
+                    },
+                    player: null
+                },
+                category: category.id
+            }
+            await setDoc(doc(db, "games", id), game);
+            router.push('/game/' + id);
+        } else if(mode === 'vs' && user && selectedFriend) {
+            // VS friend (send request)
+            const gameID = crypto.randomUUID();
+            const request: GameRequest = {
+                id: gameID,
+                sender: user?.uid,
+                receiver: selectedFriend.uid,
+                endTime: new Date(new Date().getTime() + 5*60000),
+                categoryName: category.name
+            }
+            await setDoc(doc(db, "gameRequests", gameID), request);
+            const game: Game = {
+                id: gameID,
+                players: [user.uid, selectedFriend.uid],
+                questions: await getRandomQuestions(category.id),
+                mode: "vs",
+                status: "waiting",
+                data: {
+                    host: {
+                        uid: user.uid,
+                        answers: Array<string | null>(),
+                        correct: Array<boolean>()
+                    },
+                    player: {
+                        uid: selectedFriend.uid,
+                        answers: Array<string | null>(),
+                        correct: Array<boolean>(),
+                    }
+                },
+                category: category.id
+            }
+            await setDoc(doc(db, "games", gameID), game);
+            router.push('/game/' + gameID);
+        }
     }
 
     return (
@@ -91,9 +131,9 @@ function GameModal({ category, setMenu }: {category: Category, setMenu: Function
                 {mode === 'vs' && <div className="flex-col w-full flex">
                     Select a friend that you want to play with
                     <div className="h-40 w-full overflow-auto flex flex-col border-2 border-primary-300">
-                        {onlineFriends.length != 0 ?
+                        {user?.friends.length != 0 ?
                             <div className="w-full h-full overflow-auto flex flex-col">
-                                {onlineFriends.map((friend) => {
+                                {friends.map((friend) => {
                                     return (
                                         <div onClick={() => setSelectedFriend(friend)} key={friend.uid} className={`w-full p-2 hover:bg-primary-300/50 cursor-pointer text-stone-50 flex gap-4 items-center ${selectedFriend?.uid === friend.uid && 'bg-primary-300/30'}`}>
                                             {friend.photoURL && <img src={friend.photoURL} className='h-8 w-8 rounded-full' alt={friend.username} />}

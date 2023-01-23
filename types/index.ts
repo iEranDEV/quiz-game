@@ -41,20 +41,31 @@ declare global {
 
     type Game = {
         id: string,
-        host: string,
-        player: string | null,
+        players: [string, string | null],
         questions: Array<Question>,
         mode: 'solo' | 'vs',
-        loading: boolean,
-        answers: {host: Array<string>, player: Array<string>},
+        status: 'waiting' | 'canceled' | 'finished' | 'quiz',
+        data: {
+            host: {
+                uid: string,
+                answers: Array<string | null>,
+                correct: Array<boolean>
+            },
+            player: {
+                uid: string,
+                answers: Array<string | null>,
+                correct: Array<boolean>
+            } | null
+        },
         category: string,
     }
 
-    type GameResult = {
+    type GameRequest = {
         id: string,
-        category: string,
-        player: string | null,
-        result: string,
+        sender: string,
+        receiver: string,
+        endTime: Date,
+        categoryName: string,
     }
 
 }

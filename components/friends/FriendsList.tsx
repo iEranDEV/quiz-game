@@ -1,4 +1,3 @@
-import axios from "axios";
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import Link from "next/link";
 import { useEffect, useState, useContext } from "react";

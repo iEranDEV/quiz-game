@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 
 type CountdownProps = {
-    questions: Array<Question>,
-    setQuestions: Function,
-    mode: 'quiz' | 'results',
+    questions: Array<Question> | null,
+    mode: 'quiz' | 'results' | null,
     setMode: Function
 }
 
-function Countdown({ questions, setQuestions, mode, setMode }: CountdownProps) {
+function Countdown({ questions, mode, setMode }: CountdownProps) {
 
     const barRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +26,7 @@ function Countdown({ questions, setQuestions, mode, setMode }: CountdownProps) {
     }, [mode]);
 
     return (
-        <div ref={barRef} className="w-full animate-progress bg-green-500 h-2">
+        <div ref={barRef} className="w-full bg-green-500 h-2">
         </div>
     )
 }   
